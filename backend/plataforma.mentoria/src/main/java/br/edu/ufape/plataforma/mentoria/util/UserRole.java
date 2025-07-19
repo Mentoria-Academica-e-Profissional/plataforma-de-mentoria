@@ -2,8 +2,8 @@ package br.edu.ufape.plataforma.mentoria.util;
 
 public enum UserRole {
     
-    ADMIN("ADMIN"),
-    USER("USER");
+    MENTOR("MENTOR"),
+    MENTORADO("MENTORADO");
 
     private final String role;
 

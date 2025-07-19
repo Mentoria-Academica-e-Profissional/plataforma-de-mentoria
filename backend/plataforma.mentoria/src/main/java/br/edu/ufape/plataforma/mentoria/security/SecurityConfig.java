@@ -28,7 +28,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
             .anyRequest().permitAll()
             //.requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-            //.requestMatchers("/location/**", "/booking/**").hasRole("ADMIN")
+            //.requestMatchers("/location/**", "/booking/**").hasRole("MENTOR")
             //To-do: substituir as rodas, quando estas estiverem devidamente implementadas
             //.anyRequest().authenticated()
             )
