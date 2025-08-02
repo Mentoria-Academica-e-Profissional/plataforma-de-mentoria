@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { Mentor } from '../entity/mentor';
+import { Mentor } from './../entity/mentor';
 import { EditMentorProfileModalComponent } from './edit-mentor-profile-modal/edit-mentor-profile-modal.component';
 
 @Component({

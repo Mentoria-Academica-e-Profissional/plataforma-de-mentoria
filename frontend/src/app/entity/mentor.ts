@@ -9,3 +9,4 @@ export interface Mentor extends User {
     specializations: string[];
     interestArea: string;
 }
+

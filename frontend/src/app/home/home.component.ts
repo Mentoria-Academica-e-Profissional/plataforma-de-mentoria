@@ -33,6 +33,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this.authService.hasRole('MENTOR');
   }
   private searchSubject = new Subject<string>();
+  
   ngOnInit() {
     this.searchSubject
       .pipe(debounceTime(322), distinctUntilChanged())
@@ -46,7 +47,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   onSearchInput(value: string): void {
-    this.searchSubject.next(value);
+    this.searchMentorsByInterest(value);
   }
 
   performSearch(interest: string): void {
@@ -79,12 +80,30 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+
   results: any[] = [];
+
 
   searchMentoredByInterest(interest: string): void {
     this.performSearch(interest);
   }
 
+  
+  mentorResults: any[] = [];
+
+searchMentorsByInterest(interest: string): void {
+  if (!interest.trim()) {
+    this.mentorResults = [];
+    return;
+  }
+  this.mentorResults = this.mentorsMockList.filter((mentor) =>
+    mentor.interests.some((i: string) =>
+      i.toLowerCase().includes(interest.toLowerCase())
+    ) ||
+    mentor.specialization.toLowerCase().includes(interest.toLowerCase())
+  );
+  this.mentorResults.sort((a, b) => a.name.localeCompare(b.name));
+}
   mentoredMockList: any[] = [
     {
       id: 1,
@@ -177,4 +196,38 @@ export class HomeComponent implements OnInit, OnDestroy {
       course: 'Sistemas de Informação',
     },
   ];
+
+  mentorsMockList: any[] = [
+  {
+    id: 1,
+    name: 'Alice Mentor',
+    interests: ['Programação', 'Angular', 'Carreira'],
+    specialization: 'Desenvolvimento Web',
+  },
+  {
+    id: 2,
+    name: 'Bob Mentor',
+    interests: ['Inovação', 'Startups'],
+    specialization: 'Empreendedorismo',
+  },
+  {
+    id: 3,
+    name: 'Charlie Mentor',
+    interests: ['Tecnologia', 'Inovação'],
+    specialization: 'Desenvolvimento de Software',
+  },
+  {
+    id: 4,
+    name: 'Diana Mentor',
+    interests: ['Carreira', 'Mentoria'],
+    specialization: 'Coaching',
+  },
+  {
+    id: 5,
+    name: 'Eva Mentor',
+    interests: ['Marketing', 'Vendas'],
+    specialization: 'Estratégia de Negócios',
+  },
+];
+
 }

@@ -14,17 +14,6 @@
               ? "Encontre o mentorado ideal para você!"
               : "Encontre o mentor ideal para você!"
           }}
-        </p>
-        <h2 class="search-title">
-          {{ hasMentorRole() ? "Buscar Mentorado" : "Buscar Mentor" }}
-        </h2>
-        <input
-          #searchInput
-          type="text"
-          class="search-input"
-          placeholder="Área de Interesse..."
-          (input)="onSearchInput(searchInput.value)"
-        />
 
         <div class="search-results">
           <div *ngFor="let result of results" class="search-item">
@@ -52,3 +41,24 @@
     />
   </svg>
 </a>
+<div class="mentor-search-center">
+  <input
+    #mentorSearch
+    type="text"
+    placeholder="Buscar mentores por área de interesse ou especialização"
+    (input)="onSearchInput(mentorSearch.value)"
+    class="search-input"
+  />
+  <div *ngIf="mentorResults.length > 0" class="mentor-results">
+    <h3>Mentores encontrados:</h3>
+    <ul>
+      <li *ngFor="let mentor of mentorResults">
+        <strong>{{ mentor.name }}</strong> - {{ mentor.specialization }}<br>
+        <small>Áreas de interesse: {{ mentor.interests.join(', ') }}</small>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="mentorResults.length === 0">
+    <p>Nenhum mentor encontrado.</p>
+  </div>
+</div>
