@@ -53,7 +53,7 @@ class MentoredSearchServiceTest {
         mentored = new Mentored("Joestar", "12345678900",
                 LocalDate.of(2000, 1, 1),
                 Course.ADMINISTRACAO, user,
-                "Estudante de Administração", InterestArea.CIBERSEGURANCA);
+                "Estudante de Administração", List.of(InterestArea.CIBERSEGURANCA));
         mentored.setId(1L);
     }
 
