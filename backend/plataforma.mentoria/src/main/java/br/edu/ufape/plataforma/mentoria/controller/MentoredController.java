@@ -2,9 +2,6 @@ package br.edu.ufape.plataforma.mentoria.controller;
 
 import java.util.Collections;
 import java.util.List;
-
-import br.edu.ufape.plataforma.mentoria.service.MentorSearchService;
-import br.edu.ufape.plataforma.mentoria.service.MentoredSearchService;
 import br.edu.ufape.plataforma.mentoria.service.contract.MentorSearchServiceInterface;
 import br.edu.ufape.plataforma.mentoria.service.contract.MentoredSearchServiceInterface;
 import br.edu.ufape.plataforma.mentoria.service.contract.MentoredServiceInterface;
@@ -21,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.edu.ufape.plataforma.mentoria.dto.MentorDTO;
 import br.edu.ufape.plataforma.mentoria.dto.MentoredDTO;
 import br.edu.ufape.plataforma.mentoria.dto.UpdateMentoredDTO;

@@ -2,15 +2,12 @@ package br.edu.ufape.plataforma.mentoria.model;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import br.edu.ufape.plataforma.mentoria.enums.Course;
 import br.edu.ufape.plataforma.mentoria.enums.InterestArea;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass

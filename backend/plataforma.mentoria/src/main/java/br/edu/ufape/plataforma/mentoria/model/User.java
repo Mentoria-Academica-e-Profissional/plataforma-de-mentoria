@@ -2,11 +2,9 @@ package br.edu.ufape.plataforma.mentoria.model;
 
 import java.util.Collection;
 import java.util.List;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import br.edu.ufape.plataforma.mentoria.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

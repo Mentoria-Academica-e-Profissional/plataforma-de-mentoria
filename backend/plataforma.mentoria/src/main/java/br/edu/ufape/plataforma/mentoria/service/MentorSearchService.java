@@ -6,7 +6,6 @@ import br.edu.ufape.plataforma.mentoria.exceptions.EntityNotFoundException;
 import br.edu.ufape.plataforma.mentoria.mapper.MentorMapper;
 import br.edu.ufape.plataforma.mentoria.model.Mentor;
 import br.edu.ufape.plataforma.mentoria.repository.MentorRepository;
-import br.edu.ufape.plataforma.mentoria.repository.UserRepository;
 import br.edu.ufape.plataforma.mentoria.service.contract.MentorSearchServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -24,9 +23,6 @@ public class MentorSearchService implements MentorSearchServiceInterface {
 
     @Autowired
     private MentorMapper mentorMapper;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Override
     public Mentor getMentorById(Long id) {
