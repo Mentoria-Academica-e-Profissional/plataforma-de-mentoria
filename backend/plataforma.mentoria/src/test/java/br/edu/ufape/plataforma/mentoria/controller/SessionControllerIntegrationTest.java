@@ -50,8 +50,9 @@ public class SessionControllerIntegrationTest {
         mentorUser.setEmail("mentor" + System.currentTimeMillis() + "@test.com");
         mentorUser.setPassword("senha123");
         mentorUser.setRole(br.edu.ufape.plataforma.mentoria.enums.UserRole.MENTOR);
-        String mentorCpf = String.valueOf(System.currentTimeMillis());
+        String mentorCpf = java.util.UUID.randomUUID().toString().replaceAll("[^0-9]", "");
         if (mentorCpf.length() > 11) mentorCpf = mentorCpf.substring(0, 11);
+        else while (mentorCpf.length() < 11) mentorCpf += "0";
         Mentor mentor = new Mentor.Builder()
                 .fullName("Mentor Teste")
                 .cpf(mentorCpf)
@@ -72,8 +73,9 @@ public class SessionControllerIntegrationTest {
         mentoredUser.setRole(br.edu.ufape.plataforma.mentoria.enums.UserRole.MENTORADO);
         Mentored mentored = new Mentored();
         mentored.setFullName("Mentorado Teste");
-        String mentoredCpf = String.valueOf(System.currentTimeMillis() + 10000);
+        String mentoredCpf = java.util.UUID.randomUUID().toString().replaceAll("[^0-9]", "");
         if (mentoredCpf.length() > 11) mentoredCpf = mentoredCpf.substring(0, 11);
+        else while (mentoredCpf.length() < 11) mentoredCpf += "1";
         mentored.setCpf(mentoredCpf);
         mentored.setBirthDate(java.time.LocalDate.of(2000, 1, 1));
         mentored.setCourse(Course.CIENCIA_DA_COMPUTACAO);
