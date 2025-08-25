@@ -53,12 +53,12 @@ public class SessionDTO {
         this.mentorId = mentorId;
     }
 
-    public @NotNull(message = "O ID do mentorado é obrigatório") Long getMentoredID() {
+    public @NotNull(message = "O ID do mentorado é obrigatório") Long getMentoredId() {
         return mentoredId;
     }
 
-    public void setMentoredId(@NotNull(message = "O ID do mentorado é obrigatório") Long mentoredID) {
-        this.mentoredId = mentoredID;
+    public void setMentoredId(@NotNull(message = "O ID do mentorado é obrigatório") Long mentoredId) {
+        this.mentoredId = mentoredId;
     }
 
     public LocalDate getDate() {

@@ -47,8 +47,8 @@ public class SessionService implements SessionServiceInterface {
         Mentor mentor = mentorRepository.findById(sessionDTO.getMentorId())
                 .orElseThrow(() -> new EntityNotFoundException(Mentor.class, sessionDTO.getMentorId()));
 
-        Mentored mentored = mentoredRepository.findById(sessionDTO.getMentoredID())
-                .orElseThrow(() -> new EntityNotFoundException(Mentored.class, sessionDTO.getMentoredID()));
+        Mentored mentored = mentoredRepository.findById(sessionDTO.getMentoredId())
+                .orElseThrow(() -> new EntityNotFoundException(Mentored.class, sessionDTO.getMentoredId()));
 
         if (mentor.getId().equals(mentored.getId())) {
             throw new IllegalArgumentException("Mentor e Mentorado não podem ser a mesma pessoa.");
@@ -68,6 +68,7 @@ public class SessionService implements SessionServiceInterface {
         existingSession.setTime(sessionDTO.getTime());
         existingSession.setMeetingTopic(sessionDTO.getMeetingTopic());
         existingSession.setLocation(sessionDTO.getLocation());
+        existingSession.setStatus(sessionDTO.getStatus()); // Corrige atualização do status
 
         return sessionMapper.toDTO(sessionRepository.save(existingSession));
     }
