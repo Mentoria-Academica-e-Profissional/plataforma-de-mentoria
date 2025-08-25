@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MentoredSearchService implements MentoredSearchServiceInterface {
@@ -50,7 +49,7 @@ public class MentoredSearchService implements MentoredSearchServiceInterface {
         List<Mentored> mentoreds = mentoredRepository.findByInterestArea(interestArea);
         return mentoreds.stream()
                 .map(mentoredMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

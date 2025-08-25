@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MentorSearchService implements MentorSearchServiceInterface {
@@ -58,6 +57,6 @@ public class MentorSearchService implements MentorSearchServiceInterface {
                 specialization);
         return mentors.stream()
                 .map(mentorMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -123,7 +123,7 @@ class SessionServiceTest {
     @Test
     void createSession_MentoredNotFound_ShouldThrow() {
         when(mentorRepository.findById(sessionDTO.getMentorId())).thenReturn(Optional.of(mentor));
-        when(mentoredRepository.findById(sessionDTO.getMentoredID())).thenReturn(Optional.empty());
+        when(mentoredRepository.findById(sessionDTO.getMentoredId())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> sessionService.createSession(sessionDTO));
     }
@@ -169,17 +169,15 @@ class SessionServiceTest {
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
         when(mentoredRepository.findById(mentored.getId())).thenReturn(Optional.of(mentored));
 
-        // Mocka o retorno do sessionRepository.findByUserAndGuestOrUserAndGuest
         when(sessionRepository.findByMentorIdAndMentoredId(mentor.getId(), mentored.getId()))
                 .thenReturn(List.of(session));
 
-        // Mocka a conversão da entidade Session para SessionDTO
+     
         when(sessionMapper.toDTO(session)).thenReturn(sessionDTO);
 
-        // Chama o método do serviço
+   
         List<SessionDTO> sessionHistory = sessionService.findSessionHistoryBetweenUsers(mentor.getId(), mentored.getId());
 
-        // Verificações
         assertNotNull(sessionHistory);
         assertFalse(sessionHistory.isEmpty());
         assertEquals(1, sessionHistory.size());
@@ -189,7 +187,7 @@ class SessionServiceTest {
     @Test
     void findSessionHistoryBetweenUsers_MentoredNotFound_ShouldThrow() {
         when(mentorRepository.findById(sessionDTO.getMentorId())).thenReturn(Optional.of(mentor));
-        when(mentoredRepository.findById(sessionDTO.getMentoredID())).thenReturn(Optional.empty());
+        when(mentoredRepository.findById(sessionDTO.getMentoredId())).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> sessionService.findSessionHistoryBetweenUsers(mentor.getId(), mentored.getId()));
     }
 
@@ -203,7 +201,7 @@ class SessionServiceTest {
     void findSessionHistoryMentor() {
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
 
-        // Retorna sessão só em findByUserId, findByGuestId vazio
+    
         when(sessionRepository.findByMentorId(mentor.getId()))
                 .thenReturn(List.of(session));
 
@@ -227,7 +225,7 @@ class SessionServiceTest {
     void findSessionHistoryMentored() {
        when(mentoredRepository.findById(mentored.getId())).thenReturn(Optional.of(mentored));
 
-       // Retorna sessão só em findByUserId, findByGuestId vazio
+    
        when(sessionRepository.findByMentoredId(mentored.getId()))
                .thenReturn(List.of(session));
 
@@ -243,7 +241,7 @@ class SessionServiceTest {
 
     @Test
     void findSessionHistoryMentored_MentoredNotFound_ShouldThrow() {
-        when(mentoredRepository.findById(sessionDTO.getMentoredID())).thenReturn(Optional.empty());
+        when(mentoredRepository.findById(sessionDTO.getMentoredId())).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> sessionService.findSessionHistoryMentored(mentored.getId()));
     }
 
@@ -251,16 +249,20 @@ class SessionServiceTest {
     void updateSession() {
         when(sessionRepository.findById(session.getId())).thenReturn(Optional.of(session));
         when(sessionRepository.save(any(Session.class))).thenReturn(session);
-        when(sessionMapper.toDTO(any())).thenAnswer(inv -> {
+        when(sessionMapper.toDTO(any(Session.class))).thenAnswer(inv -> {
+            Session s = inv.getArgument(0);
             SessionDTO dto = new SessionDTO();
-            dto.setDate(session.getDate());
-            dto.setTime(session.getTime());
-            dto.setMeetingTopic(session.getMeetingTopic());
-            dto.setLocation("Casa nova");
-            dto.setStatus(Status.CANCELLED); // Corrija para o status esperado
+            dto.setDate(s.getDate());
+            dto.setTime(s.getTime());
+            dto.setMeetingTopic(s.getMeetingTopic());
+            dto.setLocation(s.getLocation());
+            dto.setStatus(s.getStatus());
             return dto;
         });
 
+ 
+        session.setStatus(Status.CANCELLED);
+        sessionDTO.setStatus(Status.CANCELLED);
         SessionDTO updated = sessionService.updateSession(session.getId(), sessionDTO);
 
         assertNotNull(updated);
@@ -307,7 +309,7 @@ class SessionServiceTest {
     void updateSessionStatus_PendingToInvalid_ShouldThrow() {
         session.setStatus(Status.PENDING);
         when(sessionRepository.findById(session.getId())).thenReturn(Optional.of(session));
-        // Tenta mudar de PENDING para COMPLETED (não permitido)
+    
         assertThrows(IllegalArgumentException.class, () ->
                 sessionService.updateSessionStatus(session.getId(), Status.COMPLETED)
         );
@@ -317,7 +319,7 @@ class SessionServiceTest {
     void updateSessionStatus_AcceptedToInvalid_ShouldThrow() {
         session.setStatus(Status.ACCEPTED);
         when(sessionRepository.findById(session.getId())).thenReturn(Optional.of(session));
-        // Tenta mudar de ACCEPTED para REJECTED (não permitido)
+  
         assertThrows(IllegalArgumentException.class, () ->
                 sessionService.updateSessionStatus(session.getId(), Status.REJECTED)
         );
@@ -327,7 +329,6 @@ class SessionServiceTest {
     void updateSessionStatus_FinalStatus_ShouldThrow() {
         session.setStatus(Status.REJECTED);
         when(sessionRepository.findById(session.getId())).thenReturn(Optional.of(session));
-        // Tenta mudar de REJECTED para qualquer outro status
         assertThrows(IllegalArgumentException.class, () ->
                 sessionService.updateSessionStatus(session.getId(), Status.PENDING)
         );
