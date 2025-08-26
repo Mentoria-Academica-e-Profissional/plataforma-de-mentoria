@@ -11,8 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -59,11 +59,13 @@ class MentorServiceTest {
         Mentor savedMentor = new Mentor.Builder().build();
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         when(userRepository.findByEmail(anyString())).thenReturn(user);
         when(mentorMapper.toEntity(mentorDTO)).thenReturn(mentor);
-        when(mentorRepository.existsByCpf(mentor.getCpf())).thenReturn(false);
+        when(mentorRepository.existsByCpf(any())).thenReturn(false);
         when(mentorRepository.save(mentor)).thenReturn(savedMentor);
         when(mentorMapper.toDTO(savedMentor)).thenReturn(mentorDTO);
+
         MentorDTO result = mentorService.createMentor(mentorDTO);
 
         assertEquals(mentorDTO, result);
@@ -75,10 +77,12 @@ class MentorServiceTest {
         MentorDTO mentorDTO = new MentorDTO.Builder().build();
         Mentor mentor = new Mentor.Builder().build();
         User user = new User();
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        when(userRepository.findByEmail(anyString())).thenReturn(user);
+
+        doReturn(user).when(userRepository).findByEmail(anyString());
         when(mentorMapper.toEntity(mentorDTO)).thenReturn(mentor);
-        when(mentorRepository.existsByCpf(mentor.getCpf())).thenReturn(true);
+        when(mentorRepository.existsByCpf(any())).thenReturn(true);
 
         assertThrows(AttributeAlreadyInUseException.class, () -> mentorService.createMentor(mentorDTO));
     }
