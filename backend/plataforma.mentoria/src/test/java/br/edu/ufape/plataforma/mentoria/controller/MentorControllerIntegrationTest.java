@@ -464,4 +464,68 @@ class MentorControllerIntegrationTest {
                                 .with(userAuth))
                                 .andExpect(status().isNotFound());
         }
+
+        @Test
+        void shouldReturnNotFoundWhenUpdateMentorReturnsNull() throws Exception {
+                String email = createUniqueUser();
+                String cpf = generateUniqueCpf("98765");
+                MentorDTO mentorDTO = buildValidMentorDTO(cpf);
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                String response = mockMvc.perform(post("/mentor")
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mentorDTO)))
+                                .andReturn().getResponse().getContentAsString();
+                MentorDTO created = objectMapper.readValue(response, MentorDTO.class);
+
+                mockMvc.perform(delete("/mentor/" + created.getId())
+                                .with(userAuth));
+
+                MentorDTO updateDTO = buildValidMentorDTO(generateUniqueCpf("11122"));
+                mockMvc.perform(put("/mentor/" + created.getId())
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDTO)))
+                                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenPatchMentorReturnsNull() throws Exception {
+                String email = createUniqueUser();
+                String cpf = generateUniqueCpf("56789");
+                MentorDTO mentorDTO = buildValidMentorDTO(cpf);
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                String response = mockMvc.perform(post("/mentor")
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mentorDTO)))
+                                .andReturn().getResponse().getContentAsString();
+                MentorDTO created = objectMapper.readValue(response, MentorDTO.class);
+
+                mockMvc.perform(delete("/mentor/" + created.getId())
+                                .with(userAuth));
+
+                UpdateMentorDTO updateDTO = buildValidUpdateMentorDTO();
+                mockMvc.perform(patch("/mentor/" + created.getId())
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDTO)))
+                                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenCurrentMentorIsNull() throws Exception {
+                String email = createUniqueUser();
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                mockMvc.perform(get("/mentor/me")
+                                .with(userAuth))
+                                .andExpect(status().isNotFound());
+        }
+
 }
