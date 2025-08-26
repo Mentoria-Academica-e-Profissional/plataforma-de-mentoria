@@ -7,15 +7,24 @@ import br.edu.ufape.plataforma.mentoria.enums.InterestArea;
 import br.edu.ufape.plataforma.mentoria.enums.Course;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 import br.edu.ufape.plataforma.mentoria.model.User;
 import br.edu.ufape.plataforma.mentoria.enums.UserRole;
 import br.edu.ufape.plataforma.mentoria.repository.UserRepository;
+import br.edu.ufape.plataforma.mentoria.service.MentorSearchService;
+import br.edu.ufape.plataforma.mentoria.service.MentorService;
+import br.edu.ufape.plataforma.mentoria.service.MentoredSearchService;
+
 import static org.hamcrest.Matchers.*;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -28,6 +37,15 @@ class MentorControllerIntegrationTest {
         private ObjectMapper objectMapper;
         @Autowired
         private UserRepository userRepository;
+
+        @Mock
+        private MentorService mentorService; // Para operações de escrita (create, update, delete)
+
+        @Mock
+        private MentorSearchService mentorSearchService; // Para operações de leitura (find)
+
+        @Mock
+        private MentoredSearchService mentoredSearchService;
 
         private static final String TEST_PASSWORD = "senha123";
 
@@ -526,6 +544,50 @@ class MentorControllerIntegrationTest {
                 mockMvc.perform(get("/mentor/me")
                                 .with(userAuth))
                                 .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenGetCurrentMentorReturnsNull() throws Exception {
+                String email = createUniqueUser();
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                when(mentorSearchService.getCurrentMentor()).thenReturn(null);
+
+                mockMvc.perform(get("/mentor/me")
+                                .with(userAuth))
+                                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenPatchReturnsNull() throws Exception {
+                String email = createUniqueUser();
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                UpdateMentorDTO updateDTO = buildValidUpdateMentorDTO();
+                long existingMentorId = 1L;
+
+                when(mentorService.updateMentor(eq(existingMentorId), org.mockito.Mockito.any(UpdateMentorDTO.class)))
+                                .thenReturn(null);
+
+                mockMvc.perform(patch("/mentor/" + existingMentorId)
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDTO)))
+                                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenSearchMentoredsReceivesInvalidArea() throws Exception {
+                String email = createUniqueUser();
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                mockMvc.perform(get("/mentor/mentoreds/search")
+                                .param("interestArea", "AREA_INVALIDA")
+                                .with(userAuth))
+                                .andExpect(status().isBadRequest());
         }
 
 }
