@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class MentorControllerMissingIntegrationTest {
+class MentorControllerIntegrationTest {
         @Autowired
         private MockMvc mockMvc;
         @Autowired
@@ -313,5 +313,155 @@ class MentorControllerMissingIntegrationTest {
                                 .andExpect(status().isBadRequest())
                                 .andExpect(jsonPath("$").isArray())
                                 .andExpect(jsonPath("$", empty()));
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenGettingNonExistentMentorById() throws Exception {
+                String email = createUniqueUser();
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                mockMvc.perform(get("/mentor/999999")
+                                .with(userAuth))
+                                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldSuccessfullyDeleteExistingMentor() throws Exception {
+                String email = createUniqueUser();
+                String cpf = generateUniqueCpf("77777");
+                MentorDTO mentorDTO = buildValidMentorDTO(cpf);
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                String response = mockMvc.perform(post("/mentor")
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mentorDTO)))
+                                .andReturn().getResponse().getContentAsString();
+                MentorDTO created = objectMapper.readValue(response, MentorDTO.class);
+
+                mockMvc.perform(delete("/mentor/" + created.getId())
+                                .with(userAuth))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Mentor(a) removido(a) com sucesso!"));
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenDeletingNonExistentMentor() throws Exception {
+                String email = createUniqueUser();
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                mockMvc.perform(delete("/mentor/999999")
+                                .with(userAuth))
+                                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldSuccessfullyUpdateExistingMentor() throws Exception {
+                String email = createUniqueUser();
+                String cpf = generateUniqueCpf("11111");
+                MentorDTO mentorDTO = buildValidMentorDTO(cpf);
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                String response = mockMvc.perform(post("/mentor")
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mentorDTO)))
+                                .andReturn().getResponse().getContentAsString();
+                MentorDTO created = objectMapper.readValue(response, MentorDTO.class);
+
+                MentorDTO updateDTO = buildValidMentorDTO(generateUniqueCpf("22222"));
+                updateDTO.setFullName("Updated Full Name");
+
+                mockMvc.perform(put("/mentor/" + created.getId())
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDTO)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.fullName", is("Updated Full Name")));
+        }
+
+        @Test
+        void shouldReturnBadRequestForUpdateWithInvalidData() throws Exception {
+                String email = createUniqueUser();
+                String cpf = generateUniqueCpf("33333");
+                MentorDTO mentorDTO = buildValidMentorDTO(cpf);
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                String response = mockMvc.perform(post("/mentor")
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mentorDTO)))
+                                .andReturn().getResponse().getContentAsString();
+                MentorDTO created = objectMapper.readValue(response, MentorDTO.class);
+
+                MentorDTO invalidUpdateDTO = new MentorDTO();
+                invalidUpdateDTO.setFullName("");
+                invalidUpdateDTO.setCpf("");
+
+                mockMvc.perform(put("/mentor/" + created.getId())
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(invalidUpdateDTO)))
+                                .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void shouldGetExistingMentorById() throws Exception {
+                String email = createUniqueUser();
+                String cpf = generateUniqueCpf("12345");
+                MentorDTO mentorDTO = buildValidMentorDTO(cpf);
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                String response = mockMvc.perform(post("/mentor")
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mentorDTO)))
+                                .andReturn().getResponse().getContentAsString();
+                MentorDTO created = objectMapper.readValue(response, MentorDTO.class);
+
+                mockMvc.perform(get("/mentor/" + created.getId())
+                                .with(userAuth))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.fullName", is("Test Mentor")))
+                                .andExpect(jsonPath("$.cpf", is(cpf)));
+        }
+
+        @Test
+        void shouldReturnBadRequestForUpdateWithMalformedJson() throws Exception {
+                String email = createUniqueUser();
+                String cpf = generateUniqueCpf("54321");
+                MentorDTO mentorDTO = buildValidMentorDTO(cpf);
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                String response = mockMvc.perform(post("/mentor")
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(mentorDTO)))
+                                .andReturn().getResponse().getContentAsString();
+                MentorDTO created = objectMapper.readValue(response, MentorDTO.class);
+
+                mockMvc.perform(put("/mentor/" + created.getId())
+                                .with(userAuth)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ invalid json }"))
+                                .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void shouldHandleEntityNotFoundExceptionOnDelete() throws Exception {
+                String email = createUniqueUser();
+                var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                                .user(email).roles("MENTOR");
+
+                mockMvc.perform(delete("/mentor/999999")
+                                .with(userAuth))
+                                .andExpect(status().isNotFound());
         }
 }
