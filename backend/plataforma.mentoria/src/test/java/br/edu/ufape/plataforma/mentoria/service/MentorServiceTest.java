@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -56,14 +58,12 @@ class MentorServiceTest {
         User user = new User();
         Mentor savedMentor = new Mentor.Builder().build();
 
-        when(authentication.getName()).thenReturn("test@example.com");
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        when(userRepository.findByEmail("test@example.com")).thenReturn(user);
+        when(userRepository.findByEmail(anyString())).thenReturn(user);
         when(mentorMapper.toEntity(mentorDTO)).thenReturn(mentor);
         when(mentorRepository.existsByCpf(mentor.getCpf())).thenReturn(false);
         when(mentorRepository.save(mentor)).thenReturn(savedMentor);
         when(mentorMapper.toDTO(savedMentor)).thenReturn(mentorDTO);
-
         MentorDTO result = mentorService.createMentor(mentorDTO);
 
         assertEquals(mentorDTO, result);
@@ -71,15 +71,12 @@ class MentorServiceTest {
     }
 
     @Test
-    @SuppressWarnings("unused")
     void testCreateMentor_CpfAlreadyInUse() {
         MentorDTO mentorDTO = new MentorDTO.Builder().build();
         Mentor mentor = new Mentor.Builder().build();
         User user = new User();
-
-        when(authentication.getName()).thenReturn("test@example.com");
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        when(userRepository.findByEmail("test@example.com")).thenReturn(user);
+        when(userRepository.findByEmail(anyString())).thenReturn(user);
         when(mentorMapper.toEntity(mentorDTO)).thenReturn(mentor);
         when(mentorRepository.existsByCpf(mentor.getCpf())).thenReturn(true);
 
@@ -233,7 +230,8 @@ class MentorServiceTest {
         assertEquals("Complete Name", mentor.getFullName());
         assertEquals(LocalDate.of(1990, 5, 15), mentor.getBirthDate());
         assertEquals(Course.ADMINISTRACAO, mentor.getCourse());
-        assertEquals(Arrays.asList(InterestArea.TECNOLOGIA_DA_INFORMACAO, InterestArea.CIENCIA_DE_DADOS_E_IA), mentor.getInterestArea());
+        assertEquals(Arrays.asList(InterestArea.TECNOLOGIA_DA_INFORMACAO, InterestArea.CIENCIA_DE_DADOS_E_IA),
+                mentor.getInterestArea());
         assertEquals("Experienced professional", mentor.getProfessionalSummary());
         assertEquals(AffiliationType.DOCENTE, mentor.getAffiliationType());
         assertEquals(Arrays.asList("AI", "Data Science"), mentor.getSpecializations());

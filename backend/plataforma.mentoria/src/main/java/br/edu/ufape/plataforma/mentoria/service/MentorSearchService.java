@@ -32,7 +32,8 @@ public class MentorSearchService implements MentorSearchServiceInterface {
 
     @Override
     public MentorDTO getMentorDetailsDTO(Long id) {
-        Mentor mentor = this.getMentorById(id);
+        Mentor mentor = mentorRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Mentor not found with ID: " + id));
         return mentorMapper.toDTO(mentor);
     }
 
