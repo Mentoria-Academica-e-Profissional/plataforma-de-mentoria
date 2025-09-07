@@ -89,20 +89,23 @@ public class SessionService implements SessionServiceInterface {
         Session session = getSessionById(id);
         Status currentStatus = session.getStatus();
 
-        switch (currentStatus) {
-            case PENDING:
-                if (newStatus != Status.ACCEPTED && newStatus != Status.REJECTED && newStatus != Status.CANCELLED) {
-                    throw new IllegalArgumentException("Sessão pendente só pode ser Aceita, Rejeitada ou Cancelada.");
-                }
-                break;
-            case ACCEPTED:
-                if (newStatus != Status.COMPLETED && newStatus != Status.CANCELLED) {
-                    throw new IllegalArgumentException("Sessão aceita só pode ser Concluída ou Cancelada.");
-                }
-                break;
-            case REJECTED, COMPLETED, CANCELLED:
-                throw new IllegalArgumentException(
-                        "A sessão já está em um estado final (" + currentStatus + ") e não pode ser alterada.");
+        if (currentStatus == Status.PENDING) {
+            if (newStatus != Status.ACCEPTED && newStatus != Status.REJECTED && newStatus != Status.CANCELLED) {
+                throw new IllegalArgumentException("Sessão pendente só pode ser Aceita, Rejeitada ou Cancelada.");
+            }
+        } else if (currentStatus == Status.ACCEPTED) {
+            if (newStatus != Status.COMPLETED && newStatus != Status.CANCELLED) {
+                throw new IllegalArgumentException("Sessão aceita só pode ser Concluída ou Cancelada.");
+            }
+        } else if (currentStatus == Status.REJECTED) {
+            throw new IllegalArgumentException(
+                    "A sessão já está em um estado final (" + currentStatus + ") e não pode ser alterada.");
+        } else if (currentStatus == Status.CANCELLED) {
+            throw new IllegalArgumentException(
+                    "A sessão já está em um estado final (" + currentStatus + ") e não pode ser alterada.");
+        } else if (currentStatus == Status.COMPLETED) {
+            throw new IllegalArgumentException(
+                    "A sessão já está em um estado final (" + currentStatus + ") e não pode ser alterada.");
         }
 
         session.setStatus(newStatus);

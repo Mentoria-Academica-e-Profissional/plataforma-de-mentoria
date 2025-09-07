@@ -12,5 +12,6 @@ import br.edu.ufape.plataforma.mentoria.model.Mentor;
 public interface MentorRepository extends JpaRepository<Mentor, Long> {
     boolean existsByCpf(String cpf);
     Optional<Mentor> findByUserEmail(String email);
+    Mentor findByUserId(Long Id);
     List<Mentor> findByInterestAreaAndSpecializationsContaining(InterestArea interestArea, String specialization);
 }

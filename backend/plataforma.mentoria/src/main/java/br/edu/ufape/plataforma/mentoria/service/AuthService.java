@@ -44,7 +44,7 @@ public class AuthService implements UserDetailsService {
 
     public User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (email == null || email.isEmpty()) {
+        if (email.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
         }
         return this.userRepository.findByEmail(email);

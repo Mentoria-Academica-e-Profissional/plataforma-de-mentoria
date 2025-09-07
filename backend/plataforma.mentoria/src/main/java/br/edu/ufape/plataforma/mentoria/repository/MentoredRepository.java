@@ -12,5 +12,7 @@ import java.util.Optional;
 public interface MentoredRepository extends JpaRepository<Mentored, Long> {
     public boolean existsByCpf(String cpf);
     public Optional<Mentored> findByUserEmail(String email);
+    Mentored findByUserId(Long id);
+
     List<Mentored> findByInterestArea(InterestArea interestArea);
 }
