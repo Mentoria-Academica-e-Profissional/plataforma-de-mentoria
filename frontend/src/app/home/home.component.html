@@ -9,6 +9,9 @@
     <button class="logout" (click)="session()" *ngIf="isAuthenticated()">
       Marcar Sessão
     </button>
+    <button class="history-button" (click)="navigateToMaterials()" title="Biblioteca de Materiais">
+      <span>Biblioteca de Materiais</span>
+    </button>
   </header>
   <section class="content">
     <p class="welcome-message">Bem vindo!</p>

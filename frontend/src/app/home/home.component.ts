@@ -26,6 +26,10 @@ export class HomeComponent implements OnInit {
   navigateToHistory(): void {
     this.router.navigate(['/sessions/history']);
   }
+  
+  navigateToMaterials(): void {
+    this.router.navigate(['/materials']);
+  }
 
   logout() {
     this.authService.logout();

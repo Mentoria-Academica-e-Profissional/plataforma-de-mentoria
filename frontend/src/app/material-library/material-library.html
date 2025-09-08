@@ -1,0 +1,96 @@
+<main class="main">
+  <header class="brand-name">
+    <h1 class="welcome-message">Biblioteca de Materiais</h1>
+  </header>
+
+
+  <section class="mentor-search-center">
+    <h2>Materiais Sugeridos</h2>
+    <div class="materials-list">
+      <div *ngIf="suggestedMaterials.length === 0" class="no-results">
+        <p>Nenhum material sugerido encontrado.</p>
+      </div>
+      <div *ngIf="suggestedMaterials.length > 0" class="results-list">
+        <div *ngFor="let material of suggestedMaterials" class="mentored-card">
+          <h4>{{ material.title }}</h4>
+          <p><strong>Tipo:</strong> {{ getMaterialTypeName(material.materialType) }}</p>
+          <p *ngIf="material.interestArea && material.interestArea.length > 0">
+            <strong>Áreas:</strong> {{ material.interestArea.join(', ') }}
+          </p>
+          <button class="search-btn" style="margin-top: 10px;" (click)="openMaterial(material)">Visualizar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="mentor-search-center">
+    <h2>Filtros da Biblioteca</h2>
+    <form class="search-form">
+      <div class="form-group">
+        <label for="searchTerm">Buscar por título:</label>
+        <input 
+          type="text" 
+          id="searchTerm" 
+          [(ngModel)]="searchTerm" 
+          name="searchTerm"
+          (input)="applyFilters()"
+          placeholder="Digite um título para buscar..."
+          class="form-control"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="materialType">Tipo de Material:</label>
+        <select 
+          id="materialType" 
+          [(ngModel)]="selectedType" 
+          name="materialType"
+          (change)="applyFilters()"
+          class="form-control"
+        >
+          <option value="">Todos os tipos</option>
+          <option *ngFor="let type of materialTypes" [value]="type">{{getMaterialTypeName(type)}}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="interestArea">Área de Interesse:</label>
+        <select 
+          id="interestArea" 
+          [(ngModel)]="selectedArea" 
+          name="interestArea"
+          (change)="applyFilters()"
+          class="form-control"
+        >
+          <option value="">Todas as áreas</option>
+          <option *ngFor="let area of interestAreas" [value]="area.value">{{area.label}}</option>
+        </select>
+      </div>
+
+      <button type="button" class="search-btn" (click)="applyFilters()">
+        Aplicar Filtros
+      </button>
+    </form>
+  </section>
+
+ 
+  <section class="mentor-search-center">
+    <h2>Lista de Materiais</h2>
+    <div class="materials-list">
+      <div *ngIf="filteredMaterials.length === 0" class="no-results">
+        <p>Nenhum material encontrado com os filtros selecionados.</p>
+      </div>
+      <div *ngIf="filteredMaterials.length > 0" class="results-list">
+        <div *ngFor="let material of filteredMaterials" class="mentored-card">
+          <h4>{{ material.title }}</h4>
+          <p><strong>Tipo:</strong> {{ getMaterialTypeName(material.materialType) }}</p>
+          <p *ngIf="material.interestArea && material.interestArea.length > 0">
+            <strong>Áreas:</strong> {{ material.interestArea.join(', ') }}
+          </p>
+          <button class="search-btn" style="margin-top: 10px;" (click)="openMaterial(material)">Visualizar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
