@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject, of } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { Mentor } from '../entity/mentor';
 import { environment } from '../../../environments/environment';
+import { Feedback } from '../entity/Feedback';
 
 export interface ProfileData {
   type: 'MENTOR' | 'MENTORADO' | 'UNKNOWN';
@@ -137,4 +138,17 @@ updateMentoredProfile(data: any): Observable<any> {
     return this.http.get<any[]>(`${this.apiUrl}/mentor/mentoreds/search`, { params });
   }
 
+  getFeedbacks(): Observable<Feedback[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 
+      Authorization: `Bearer ${token}` 
+    });
+
+    return this.http.get<Feedback[]>(`${this.apiUrl}/avaliacoes/minhas`, { headers }).pipe(
+      catchError((error: any) => {
+        console.error('Erro ao carregar avaliações:', error);
+        return of([]);
+      })
+    );
+  }
 }
