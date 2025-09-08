@@ -48,58 +48,35 @@ public class MentorController {
 
     @GetMapping("/{idMentor}")
     public ResponseEntity<MentorDTO> getMentorDetails(@PathVariable Long idMentor) {
-        try {
-            MentorDTO mentorDTO = mentorSearchService.getMentorDetailsDTO(idMentor);
-            return ResponseEntity.ok(mentorDTO);
-        } catch (EntityNotFoundException e) {
+        MentorDTO mentorDTO = mentorSearchService.getMentorDetailsDTO(idMentor);
+        if (mentorDTO == null) {
             return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+        return ResponseEntity.ok(mentorDTO);
     }
 
     @PostMapping
     public ResponseEntity<MentorDTO> createMentor(@Valid @RequestBody MentorDTO mentorDTO) {
-        try {
-            MentorDTO savedMentorDTO = mentorService.createMentor(mentorDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedMentorDTO);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        MentorDTO savedMentorDTO = mentorService.createMentor(mentorDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedMentorDTO);
     }
 
     @PutMapping("/{idMentor}")
     public ResponseEntity<MentorDTO> updateMentor(@PathVariable Long idMentor,
             @Valid @RequestBody MentorDTO mentorDTO) {
-        try {
-            MentorDTO updatedMentorDTO = mentorService.updateMentor(idMentor, mentorDTO);
-            if (updatedMentorDTO == null) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.ok(updatedMentorDTO);
-        } catch (EntityNotFoundException e) {
+        MentorDTO updatedMentorDTO = mentorService.updateMentor(idMentor, mentorDTO);
+        if (updatedMentorDTO == null) {
             return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+        return ResponseEntity.ok(updatedMentorDTO);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<MentorDTO> partialUpdateMentor(@PathVariable Long id,
+    public ResponseEntity<MentorDTO> updateMentor(@PathVariable Long id,
             @RequestBody @Valid UpdateMentorDTO updateMentorDTO) {
-        try {
-            Mentor updatedMentor = mentorService.updateMentor(id, updateMentorDTO);
-            if (updatedMentor == null) {
-                return ResponseEntity.notFound().build();
-            }
-            MentorDTO dto = mentorMapper.toDTO(updatedMentor);
-            return ResponseEntity.ok(dto);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        Mentor updatedMentor = mentorService.updateMentor(id, updateMentorDTO);
+        MentorDTO dto = mentorMapper.toDTO(updatedMentor);
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/{idMentor}")
@@ -109,48 +86,41 @@ public class MentorController {
             return ResponseEntity.ok("Mentor(a) removido(a) com sucesso!");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro interno do servidor");
         }
     }
 
     @GetMapping("/mentoreds/search")
     public ResponseEntity<List<MentoredDTO>> searchMentored(
-            @RequestParam(required = false) InterestArea interestArea) {
+            @RequestParam(required = false) String interestArea) {
 
-        if (interestArea == null) {
+        if (interestArea == null || interestArea.isBlank()) {
             return ResponseEntity.ok(Collections.emptyList());
         }
 
-        List<MentoredDTO> results = mentoredSearchService.findByInterestArea(interestArea);
+        InterestArea interestAreaEnum = null;
+        try {
+            interestAreaEnum = InterestArea.valueOf(interestArea);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.emptyList());
+        }
+
+        List<MentoredDTO> results = mentoredSearchService.findByInterestArea(interestAreaEnum);
         return ResponseEntity.ok(results);
     }
 
     @GetMapping
     public ResponseEntity<List<MentorDTO>> getAllMentors() {
-        try {
-            List<Mentor> results = mentorSearchService.getAllMentors();
-            if (results == null || results.isEmpty()) {
-                return ResponseEntity.ok(Collections.emptyList());
-            }
-            List<MentorDTO> dtos = results.stream().map(mentorMapper::toDTO).toList();
-            return ResponseEntity.ok(dtos);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.emptyList());
-        }
+        List<Mentor> results = mentorSearchService.getAllMentors();
+        List<MentorDTO> dtos = results.stream().map(mentorMapper::toDTO).toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/me")
     public ResponseEntity<MentorDTO> getCurrentMentor() {
-        try {
-            MentorDTO mentor = mentorSearchService.getCurrentMentor();
-            return ResponseEntity.ok(mentor);
-        } catch (EntityNotFoundException e) {
+        MentorDTO mentor = mentorSearchService.getCurrentMentor();
+        if (mentor == null) {
             return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+        return ResponseEntity.ok(mentor);
     }
 }
