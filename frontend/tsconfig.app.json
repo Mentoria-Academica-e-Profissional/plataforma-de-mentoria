@@ -6,11 +6,15 @@
     "outDir": "./out-tsc/app",
     "types": []
   },
+  "files": [
+    "src/main.ts"
+  ],
   "include": [
-    "src/**/*.ts",
-    "environments/**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
-    "src/**/*.spec.ts"
+    "src/test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.worker.ts"
   ]
 }
