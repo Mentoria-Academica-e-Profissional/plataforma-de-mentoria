@@ -7,8 +7,6 @@ import { EditMentorProfileModalComponent } from '../auth/edit-mentor-profile-mod
 import { DeleteMentorModalComponent } from '../auth/delete-mentor-modal/delete-mentor-modal.component';
 import { DeleteMentoredModalComponent } from '../auth/delete-mentored-modal/delete-mentored-modal.component';
 import { AuthService } from '../auth/auth.service';
-import { MentorSearchComponent } from '../mentor-search/mentor-search';
-import { MentoredSearchComponent } from '../mentored-search/mentored-search';
 import { Router } from '@angular/router';
 
 @Component({
@@ -20,9 +18,7 @@ import { Router } from '@angular/router';
     EditMentorProfileModalComponent,
     EditMentoredModalComponent,
     DeleteMentorModalComponent,
-    DeleteMentoredModalComponent,
-    MentorSearchComponent,
-    MentoredSearchComponent
+    DeleteMentoredModalComponent
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
