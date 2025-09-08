@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProfileService, ProfileData } from './profile.service';
@@ -30,7 +30,9 @@ export class ProfileComponent implements OnInit {
   showEditModal = false;
   showDeleteModal = false;
 
-  constructor(private profileService: ProfileService, private authService: AuthService,   private router: Router) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private profileService = inject(ProfileService);
 
   ngOnInit(): void {
     this.loadProfile();
@@ -241,6 +243,10 @@ private formatInterestAreaName(area: string): string {
 
   getCourseName(course: string): string {
     return this.courseMap[course] || course || 'Não informado';
+  }
+
+  goToFeedback(): void {
+    this.router.navigate(['/profile/feedback']);
   }
 
   goBack(): void {
