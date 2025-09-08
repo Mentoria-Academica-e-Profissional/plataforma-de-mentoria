@@ -58,5 +58,11 @@ public class ReviewService {
                 .map(ReviewMapper::mapToResponseReviewDTO)
                 .collect(Collectors.toList());
     }
+
+    public List<ReviewResponseDTO> getAllReviews() {
+        return reviewRepository.findAll().stream()
+            .map(ReviewMapper::mapToResponseReviewDTO)
+            .collect(Collectors.toList());
+    }
     
 }
