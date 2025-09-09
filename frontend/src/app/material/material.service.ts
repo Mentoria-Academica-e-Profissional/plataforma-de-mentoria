@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Material } from './material-module';
-import { InterestArea } from './material-module';
+import { Material, InterestArea } from './material-module';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -13,45 +12,83 @@ export class MaterialService {
 
   constructor(private http: HttpClient) { }
 
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  private getAuthHeadersForFormData(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
   getAllMaterials(): Observable<Material[]> {
-    return this.http.get<Material[]>(this.apiUrl);
+    const headers = this.getAuthHeaders();
+    return this.http.get<Material[]>(this.apiUrl, { headers });
   }
 
   getSuggestedMaterials(): Observable<Material[]> {
-    return this.http.get<Material[]>(`${this.apiUrl}/sugestoes`);
+    const headers = this.getAuthHeaders();
+    return this.http.get<Material[]>(`${this.apiUrl}/sugestoes`, { headers });
   }
 
   createMaterial(material: Material, file?: File): Observable<Material> {
+    const headers = this.getAuthHeadersForFormData(); // Obtém os headers
     const formData = new FormData();
-    formData.append('material', new Blob([JSON.stringify(material)], { type: 'application/json' }));
-    if (file) {
-      formData.append('arquivo', file, file.name);
+    formData.append('title', material.title);
+    formData.append('materialType', material.materialType);
+    if (material.url) {
+      formData.append('url', material.url);
     }
-    return this.http.post<Material>(this.apiUrl, formData);
+    material.interestArea.forEach(area => formData.append('interestArea', area));
+    
+    if (file) {
+      const sanitizedFileName = file.name.replace(/.*[\/\\]/, '');
+      console.log('Nome do arquivo enviado para o backend:', sanitizedFileName); 
+      formData.append('arquivo', file, sanitizedFileName);
+      console.log('Nome do arquivo enviado para o backend:', sanitizedFileName); 
+    }
+    
+    // Adiciona os headers na requisição POST
+    return this.http.post<Material>(this.apiUrl, formData, { headers });
   }
 
-  // >>> NOVO MÉTODO: Atualiza um material existente
   updateMaterial(id: number, material: Material, file?: File): Observable<Material> {
+    const headers = this.getAuthHeadersForFormData(); // Obtém os headers
     const formData = new FormData();
-    formData.append('material', new Blob([JSON.stringify(material)], { type: 'application/json' }));
-    if (file) {
-      formData.append('arquivo', file, file.name);
+    formData.append('title', material.title);
+    formData.append('materialType', material.materialType);
+    if (material.url) {
+      formData.append('url', material.url);
     }
-    return this.http.put<Material>(`${this.apiUrl}/${id}`, formData);
+    material.interestArea.forEach(area => formData.append('interestArea', area));
+
+    if (file) {
+      const sanitizedFileName = file.name.replace(/.*[\/\\]/, '');
+      formData.append('arquivo', file, sanitizedFileName);
+    }
+    
+    // Adiciona os headers na requisição PUT
+    return this.http.put<Material>(`${this.apiUrl}/${id}`, formData, { headers });
   }
 
   deleteMaterial(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    const headers = this.getAuthHeaders();
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers });
   }
 
   filterMaterialsByInterestAreas(areas: InterestArea[]): Observable<Material[]> {
-    return this.http.post<Material[]>(`${this.apiUrl}/filtrar-por-areas`, areas);
+    const headers = this.getAuthHeaders();
+    return this.http.post<Material[]>(`${this.apiUrl}/filtrar-por-areas`, areas, { headers });
   }
-
-  // >>> NOVO MÉTODO: Gera a URL de download para um arquivo
+  
   getDownloadUrl(filePath: string): string {
-    // O backend serve a pasta 'upload' estaticamente.
-    // Ajuste a URL base se for diferente.
-    return `${environment.baseApiUrl}/${filePath}`;
+    const fileName = filePath.split('/').pop() || filePath;
+    const apiBase = environment.apiUrl.replace('/api', ''); 
+    return `${apiBase}/upload/${fileName}`;
   }
 }

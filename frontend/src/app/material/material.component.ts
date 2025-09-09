@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MaterialService } from './material.service';
@@ -16,32 +16,26 @@ import { Material, InterestArea, InterestAreaLabels, MaterialType } from './mate
   styleUrls: ['./material.component.css']
 })
 export class MaterialComponent implements OnInit {
-  // --- Propriedades de Estado ---
   materials: Material[] = [];
   filteredMaterials: Material[] = [];
   isLoading = false;
   
-  // --- Formulários ---
   materialForm: FormGroup;
   filterForm: FormGroup;
 
-  // --- Controle da UI ---
   showFilterForm = false;
   selectedFile: File | null = null;
   isModalOpen = false;
   modalMode: 'add' | 'edit' = 'add';
   openMenuId: number | null = null;
-  isTypeDropdownOpen = false; // Adicionado para controlar o dropdown de tipo
+  isTypeDropdownOpen = false;
   
-  // Controle das seções expansíveis
   expandedSections: { [key: string]: boolean } = {};
 
-  // --- Dados Estáticos ---
   interestAreas = Object.values(InterestArea);
   interestAreaLabels = InterestAreaLabels;
   materialTypes = Object.values(MaterialType);
 
-  // Estrutura para agrupar as áreas de interesse
   groupedInterestAreas: { name: string; key: string; items: { value: InterestArea; label: string; }[] }[] = [];
 
   constructor(
@@ -64,7 +58,17 @@ export class MaterialComponent implements OnInit {
     this.initializeGroupedAreas();
   }
 
-    clearFilters(): void {
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (this.openMenuId !== null) {
+      this.openMenuId = null;
+    }
+    if (this.isTypeDropdownOpen) {
+      this.isTypeDropdownOpen = false;
+    }
+  }
+
+  clearFilters(): void {
     this.filterInterestArray.clear();
     this.applyFilters();
   }
@@ -73,7 +77,6 @@ export class MaterialComponent implements OnInit {
     this.loadAllMaterials();
   }
 
-  // --- Getters para Acesso Fácil ---
   get materialInterestArray(): FormArray {
     return this.materialForm.get('interestArea') as FormArray;
   }
@@ -82,32 +85,48 @@ export class MaterialComponent implements OnInit {
     return this.filterForm.get('interestArea') as FormArray;
   }
 
-  // --- Carregamento de Dados ---
   loadAllMaterials(): void {
     this.isLoading = true;
     this.materialService.getAllMaterials().subscribe({
-      next: (materials) => {
-        this.materials = materials.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+      next: (materials: Material[]) => {
+        this.materials = materials.sort((a: Material, b: Material) => 
+          new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+        );
         this.filteredMaterials = this.materials;
         this.isLoading = false;
       },
-      error: () => this.isLoading = false
+      error: (error: any) => {
+        console.error('Erro ao carregar materiais:', error);
+        this.isLoading = false;
+      }
     });
   }
 
-  // --- Lógica do Modal ---
   openModal(mode: 'add' | 'edit', material: Material | null = null): void {
     this.modalMode = mode;
     this.openMenuId = null;
     
     if (mode === 'edit' && material) {
-      this.materialForm.patchValue(material);
+      this.materialForm.patchValue({
+        id: material.id,
+        title: material.title,
+        materialType: material.materialType,
+        url: material.url || ''
+      });
+      
       this.materialInterestArray.clear();
-      material.interestArea.forEach(area => this.materialInterestArray.push(this.fb.control(area)));
+      material.interestArea.forEach(area => {
+        this.materialInterestArray.push(this.fb.control(area));
+      });
     } else {
-      this.materialForm.reset({ materialType: null });
+      this.materialForm.reset({
+        materialType: null,
+        url: ''
+      });
       this.materialInterestArray.clear();
     }
+    
+    this.selectedFile = null;
     this.isModalOpen = true;
   }
 
@@ -119,7 +138,18 @@ export class MaterialComponent implements OnInit {
   }
 
   saveMaterial(): void {
-    if (!this.materialForm.valid) return;
+    if (!this.materialForm.valid) {
+      this.markFormGroupTouched(this.materialForm);
+      return;
+    }
+
+    const materialType = this.materialForm.get('materialType')?.value;
+    
+    if (materialType !== MaterialType.LINK && !this.selectedFile && this.modalMode === 'add') {
+      alert('Por favor, selecione um arquivo para upload');
+      return;
+    }
+
     this.isLoading = true;
 
     const formValue = this.materialForm.value;
@@ -139,27 +169,40 @@ export class MaterialComponent implements OnInit {
       next: () => {
         this.loadAllMaterials();
         this.closeModal();
-      },
-      error: (err) => {
-        console.error("Erro ao salvar material", err);
         this.isLoading = false;
+      },
+      error: (err: any) => {
+        console.error("Erro ao salvar material", err);
+        alert('Erro ao salvar material. Verifique os dados e tente novamente.');
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      } else {
+        control?.markAsTouched();
       }
     });
   }
   
   deleteMaterial(id: number): void {
     this.openMenuId = null;
-    setTimeout(() => {
-      if (confirm('Tem certeza que deseja excluir este material?')) {
-        this.materialService.deleteMaterial(id).subscribe({
-          next: () => this.loadAllMaterials(),
-          error: (err) => console.error('Erro ao deletar material', err)
-        });
-      }
-    }, 10);
+    if (confirm('Tem certeza que deseja excluir este material?')) {
+      this.materialService.deleteMaterial(id).subscribe({
+        next: () => this.loadAllMaterials(),
+        error: (err: any) => {
+          console.error('Erro ao deletar material', err);
+          alert('Erro ao excluir material.');
+        }
+      });
+    }
   }
 
-  // --- Lógica do Menu de Ações e Filtros ---
   toggleActionMenu(event: MouseEvent, materialId: number): void {
     event.stopPropagation();
     this.openMenuId = this.openMenuId === materialId ? null : materialId;
@@ -168,8 +211,11 @@ export class MaterialComponent implements OnInit {
   toggleAreaSelection(area: InterestArea): void {
     const array = this.filterInterestArray;
     const index = array.controls.findIndex(x => x.value === area);
-    if (index === -1) array.push(this.fb.control(area));
-    else array.removeAt(index);
+    if (index === -1) {
+      array.push(this.fb.control(area));
+    } else {
+      array.removeAt(index);
+    }
     this.applyFilters();
   }
 
@@ -184,7 +230,7 @@ export class MaterialComponent implements OnInit {
       return;
     }
     this.filteredMaterials = this.materials.filter(m => 
-      selectedAreas.some((area: InterestArea) => m.interestArea.includes(area))
+      m.interestArea.some(area => selectedAreas.includes(area))
     );
   }
 
@@ -192,7 +238,6 @@ export class MaterialComponent implements OnInit {
     this.showFilterForm = !this.showFilterForm;
   }
 
-  // --- Handlers de Formulário ---
   selectType(type: MaterialType): void {
     this.materialForm.get('materialType')?.setValue(type);
     this.isTypeDropdownOpen = false;
@@ -200,28 +245,36 @@ export class MaterialComponent implements OnInit {
   }
 
   onMaterialInterestChange(event: any): void {
-    const array = this.materialInterestArray;
-    const value = event.target.value;
-    if (event.target.checked) {
-      array.push(this.fb.control(value));
+    const value = event.target.value as InterestArea;
+    const isChecked = event.target.checked;
+    
+    if (isChecked) {
+      this.materialInterestArray.push(this.fb.control(value));
     } else {
-      const index = array.controls.findIndex(x => x.value === value);
-      if (index !== -1) array.removeAt(index);
+      const index = this.materialInterestArray.controls
+        .findIndex(ctrl => ctrl.value === value);
+      if (index !== -1) {
+        this.materialInterestArray.removeAt(index);
+      }
     }
   }
 
   onFileSelected(event: any): void {
     const file = event.target.files?.[0];
-    if (file) this.selectedFile = file;
+    if (file) {
+      this.selectedFile = file;
+    }
   }
   
   onMaterialTypeChange(): void {
     const materialType = this.materialForm.get('materialType')?.value;
     const urlControl = this.materialForm.get('url');
+    
     if (materialType === MaterialType.LINK) {
       urlControl?.setValidators([Validators.required]);
     } else {
       urlControl?.clearValidators();
+      urlControl?.setValue('');
     }
     urlControl?.updateValueAndValidity();
   }
@@ -230,7 +283,6 @@ export class MaterialComponent implements OnInit {
     this.expandedSections[section] = !this.expandedSections[section];
   }
 
-  // --- Métodos Utilitários ---
   private initializeGroupedAreas(): void {
     this.groupedInterestAreas = [
       { name: 'Tecnologia', key: 'tecnologia', items: [

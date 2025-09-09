@@ -1,7 +1,6 @@
 package br.edu.ufape.plataforma.mentoria.controller;
 
 import br.edu.ufape.plataforma.mentoria.enums.AffiliationType;
-
 import br.edu.ufape.plataforma.mentoria.dto.MentorDTO;
 import br.edu.ufape.plataforma.mentoria.enums.InterestArea;
 import br.edu.ufape.plataforma.mentoria.enums.Course;
@@ -74,7 +73,7 @@ class MentorControllerIntegrationTest {
                                 .user(email).roles("MENTOR");
 
                 // Create mentor
-                ResultActions createResult = mockMvc.perform(post("/mentor")
+                ResultActions createResult = mockMvc.perform(post("/api/mentor") 
                                 .with(userAuth)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(mentorDTO)));
@@ -82,7 +81,7 @@ class MentorControllerIntegrationTest {
                                 .andExpect(jsonPath("$.fullName", is("Test Mentor")));
 
                 // Get all mentors
-                mockMvc.perform(get("/mentor").with(userAuth))
+                mockMvc.perform(get("/api/mentor").with(userAuth)) 
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$", not(empty())));
         }
@@ -92,7 +91,7 @@ class MentorControllerIntegrationTest {
                 String email = createUniqueUser();
                 org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
                                 .user(email).roles("MENTOR");
-                mockMvc.perform(get("/mentor/999999").with(userAuth))
+                mockMvc.perform(get("/api/mentor/999999").with(userAuth)) 
                                 .andExpect(status().isNotFound());
         }
 
@@ -105,7 +104,7 @@ class MentorControllerIntegrationTest {
                                 .user(email).roles("MENTOR");
 
                 // Create mentor
-                String response = mockMvc.perform(post("/mentor")
+                String response = mockMvc.perform(post("/api/mentor") 
                                 .with(userAuth)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(mentorDTO)))
@@ -114,7 +113,7 @@ class MentorControllerIntegrationTest {
 
                 // Update mentor
                 created.setFullName("Mentor Updated");
-                mockMvc.perform(put("/mentor/" + created.getId())
+                mockMvc.perform(put("/api/mentor/" + created.getId()) 
                                 .with(userAuth)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(created)))
@@ -131,7 +130,7 @@ class MentorControllerIntegrationTest {
                                 .user(email).roles("MENTOR");
 
                 // Create mentor
-                String response = mockMvc.perform(post("/mentor")
+                String response = mockMvc.perform(post("/api/mentor") 
                                 .with(userAuth)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(mentorDTO)))
@@ -139,7 +138,7 @@ class MentorControllerIntegrationTest {
                 MentorDTO created = objectMapper.readValue(response, MentorDTO.class);
 
                 // Delete mentor
-                mockMvc.perform(delete("/mentor/" + created.getId())
+                mockMvc.perform(delete("/api/mentor/" + created.getId()) 
                                 .with(userAuth))
                                 .andExpect(status().isOk())
                                 .andExpect(content().string(containsString("sucesso")));
@@ -154,7 +153,7 @@ class MentorControllerIntegrationTest {
                                 .user(email).roles("MENTOR");
 
                 // Cria mentor
-                String response = mockMvc.perform(post("/mentor")
+                String response = mockMvc.perform(post("/api/mentor") 
                                 .with(userAuth)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(mentorDTO)))
@@ -162,7 +161,7 @@ class MentorControllerIntegrationTest {
                 MentorDTO created = objectMapper.readValue(response, MentorDTO.class);
 
                 // Busca mentor por id
-                mockMvc.perform(get("/mentor/" + created.getId()).with(userAuth))
+                mockMvc.perform(get("/api/mentor/" + created.getId()).with(userAuth)) 
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.fullName", is("Test Mentor")));
         }
@@ -174,7 +173,7 @@ class MentorControllerIntegrationTest {
                                 .user(email).roles("MENTOR");
                 MentorDTO mentorDTO = buildValidMentorDTO("123"); // CPF inválido (curto)
 
-                mockMvc.perform(post("/mentor")
+                mockMvc.perform(post("/api/mentor") 
                                 .with(userAuth)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(mentorDTO)))
@@ -190,14 +189,14 @@ class MentorControllerIntegrationTest {
                                 .user(email).roles("MENTOR");
 
                 // Cria mentor
-                mockMvc.perform(post("/mentor")
+                mockMvc.perform(post("/api/mentor") 
                                 .with(userAuth)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(mentorDTO)))
                                 .andExpect(status().isCreated());
 
                 // Tenta criar mentor com mesmo CPF
-                mockMvc.perform(post("/mentor")
+                mockMvc.perform(post("/api/mentor") 
                                 .with(userAuth)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(mentorDTO)))
@@ -209,7 +208,7 @@ class MentorControllerIntegrationTest {
                 String cpf = generateUniqueCpf("33333");
                 MentorDTO mentorDTO = buildValidMentorDTO(cpf);
                 // Não autentica
-                mockMvc.perform(post("/mentor")
+                mockMvc.perform(post("/api/mentor") 
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(mentorDTO)))
                                 .andExpect(status().isUnauthorized());

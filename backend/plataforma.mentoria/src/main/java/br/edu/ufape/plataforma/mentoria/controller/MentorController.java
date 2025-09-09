@@ -27,7 +27,7 @@ import br.edu.ufape.plataforma.mentoria.model.Mentor;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/mentor")
+@RequestMapping("/api/mentor")
 public class MentorController {
 
     private final MentorServiceInterface mentorService;

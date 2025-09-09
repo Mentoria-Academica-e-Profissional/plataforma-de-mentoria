@@ -44,18 +44,17 @@ public class MaterialService {
 
     // Padrão para caracteres permitidos no nome do arquivo
     private static final Pattern SAFE_FILENAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]+$");
-    
+
     // Extensões permitidas
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
-        ".pdf", ".doc", ".docx", ".txt", ".jpg", ".jpeg", ".png", ".mp4", ".avi", ".mov"
-    );
+            ".pdf", ".doc", ".docx", ".txt", ".jpg", ".jpeg", ".png", ".mp4", ".avi", ".mov");
 
     public MaterialService(MaterialRepository materialRepository,
-                           UserRepository userRepository,
-                           MaterialMapper materialMapper,
-                           MentoredRepository mentoredRepository,
-                           MentorRepository mentorRepository,
-                           @Value("${app.upload.dir:upload}") String uploadDirPath) {
+            UserRepository userRepository,
+            MaterialMapper materialMapper,
+            MentoredRepository mentoredRepository,
+            MentorRepository mentorRepository,
+            @Value("${app.upload.dir:upload}") String uploadDirPath) {
         this.materialRepository = materialRepository;
         this.userRepository = userRepository;
         this.materialMapper = materialMapper;
@@ -79,36 +78,34 @@ public class MaterialService {
     }
 
     /**
-     * Sanitiza o nome do arquivo removendo caracteres perigosos e validando a extensão
+     * Sanitiza o nome do arquivo removendo caracteres perigosos e validando a
+     * extensão
      */
     private String sanitizeFilename(String originalFilename) {
         if (originalFilename == null || originalFilename.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do arquivo não pode estar vazio");
         }
-        
-        // Remove path separators e caracteres perigosos
-        String sanitized = originalFilename.replaceAll("[/\\\\:*?\"<>|]", "_");
-        
-        // Remove sequências de pontos que podem ser usadas para path traversal
-        sanitized = sanitized.replaceAll("\\.{2,}", ".");
-        
-        // Remove espaços no início e fim
-        sanitized = sanitized.trim();
-        
-        // Verifica se tem extensão válida
-        String extension = getFileExtension(sanitized).toLowerCase();
+
+        String extension = getFileExtension(originalFilename).toLowerCase();
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
             throw new IllegalArgumentException("Extensão de arquivo não permitida: " + extension);
         }
-        
-        // Limita o tamanho do nome
-        if (sanitized.length() > 255) {
-            sanitized = sanitized.substring(0, 255);
+
+        // Pega o nome do arquivo sem a extensão
+        String nameWithoutExtension = originalFilename.substring(0, originalFilename.length() - extension.length());
+
+        // Remove qualquer caractere que NÃO seja letra, número, underscore ou hífen.
+        // Também substitui espaços por underscores.
+        String sanitizedName = nameWithoutExtension.replaceAll("[^a-zA-Z0-9_.-]", "").replaceAll("\\s+", "_");
+
+        // Limita o tamanho do nome do arquivo para evitar problemas no sistema de arquivos
+        if (sanitizedName.length() > 100) {
+            sanitizedName = sanitizedName.substring(0, 100);
         }
-        
-        return sanitized;
+
+        return sanitizedName + extension;
     }
-    
+
     /**
      * Extrai a extensão do arquivo
      */
@@ -116,7 +113,7 @@ public class MaterialService {
         int lastDotIndex = filename.lastIndexOf('.');
         return lastDotIndex > 0 ? filename.substring(lastDotIndex) : "";
     }
-    
+
     /**
      * Cria um nome de arquivo seguro usando UUID + nome sanitizado
      */
@@ -125,18 +122,21 @@ public class MaterialService {
         String uuid = UUID.randomUUID().toString();
         return uuid + "_" + sanitizedName;
     }
-    
+
     /**
      * Valida se o caminho final está dentro do diretório de upload permitido
      */
     private Path validateAndResolvePath(String filename) throws IOException {
-        Path resolvedPath = uploadDir.resolve(filename).normalize();
-        
-        // Verifica se o caminho final ainda está dentro do diretório de upload
-        if (!resolvedPath.startsWith(uploadDir.toAbsolutePath().normalize())) {
+        // Converte o caminho do arquivo para absoluto ANTES da validação
+        Path resolvedPath = this.uploadDir.resolve(filename).toAbsolutePath().normalize();
+        Path normalizedUploadDir = this.uploadDir.toAbsolutePath().normalize();
+
+        if (!resolvedPath.startsWith(normalizedUploadDir)) {
+            logger.error("Tentativa de Path Traversal: {} resolve para fora do diretório de upload {}", filename,
+                    normalizedUploadDir);
             throw new SecurityException("Tentativa de path traversal detectada");
         }
-        
+
         return resolvedPath;
     }
 
@@ -147,26 +147,26 @@ public class MaterialService {
                 .orElseThrow(() -> new EntityNotFoundException(User.class, userID));
 
         Material material = materialMapper.toEntity(materialDTO);
-        
+
         if (material.getMaterialType() == MaterialType.LINK) {
             material.setFilePath(null);
-        }
-        else if ((material.getMaterialType() == MaterialType.VIDEO ||
+        } else if ((material.getMaterialType() == MaterialType.VIDEO ||
                 material.getMaterialType() == MaterialType.DOCUMENTO) &&
                 arquivo != null && !arquivo.isEmpty()) {
-            
+
             // Validação de tamanho do arquivo (exemplo: máximo 50MB)
             if (arquivo.getSize() > 50 * 1024 * 1024) {
                 throw new IllegalArgumentException("Arquivo muito grande. Máximo permitido: 50MB");
             }
-            
+
             String nomeArquivoSeguro = createSecureFilename(arquivo.getOriginalFilename());
             Path caminhoCompleto = validateAndResolvePath(nomeArquivoSeguro);
-            
+
             Files.copy(arquivo.getInputStream(), caminhoCompleto);
-            material.setFilePath(caminhoCompleto.toString());
+            // Linha corrigida
+            material.setFilePath(nomeArquivoSeguro);
         }
-        
+
         material.setUserUploader(user);
 
         Material materialSalvo = materialRepository.save(material);
@@ -202,16 +202,15 @@ public class MaterialService {
 
         if (updatedMaterial.getMaterialType() == MaterialType.LINK) {
             updatedMaterial.setFilePath(null);
-        }
-        else if ((updatedMaterial.getMaterialType() == MaterialType.VIDEO ||
+        } else if ((updatedMaterial.getMaterialType() == MaterialType.VIDEO ||
                 updatedMaterial.getMaterialType() == MaterialType.DOCUMENTO) &&
                 arquivo != null && !arquivo.isEmpty()) {
-            
+
             // Validação de tamanho do arquivo
             if (arquivo.getSize() > 50 * 1024 * 1024) {
                 throw new IllegalArgumentException("Arquivo muito grande. Máximo permitido: 50MB");
             }
-            
+
             // Remove arquivo antigo se existir
             if (existingMaterial.getFilePath() != null) {
                 try {
@@ -224,16 +223,17 @@ public class MaterialService {
                     System.err.println("Não foi possível excluir o arquivo antigo: " + e.getMessage());
                 }
             }
-            
+
             String nomeArquivoSeguro = createSecureFilename(arquivo.getOriginalFilename());
             Path caminhoCompleto = validateAndResolvePath(nomeArquivoSeguro);
-            
+
             Files.copy(arquivo.getInputStream(), caminhoCompleto);
-            updatedMaterial.setFilePath(caminhoCompleto.toString());
+            // Linha corrigida
+            updatedMaterial.setFilePath(nomeArquivoSeguro);
         } else {
             updatedMaterial.setFilePath(existingMaterial.getFilePath());
         }
-        
+
         Material materialSalvo = materialRepository.save(updatedMaterial);
         logger.info("Material atualizado com sucesso. ID: {}", id);
 
@@ -245,7 +245,7 @@ public class MaterialService {
 
         Material material = materialRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Material.class, id));
-                
+
         if (material.getFilePath() != null) {
             try {
                 Path filePath = Paths.get(material.getFilePath());
@@ -253,7 +253,8 @@ public class MaterialService {
                 if (filePath.startsWith(uploadDir.toAbsolutePath().normalize())) {
                     Files.deleteIfExists(filePath);
                 } else {
-                    System.err.println("Tentativa de exclusão de arquivo fora do diretório permitido: " + material.getFilePath());
+                    System.err.println(
+                            "Tentativa de exclusão de arquivo fora do diretório permitido: " + material.getFilePath());
                 }
             } catch (IOException e) {
                 System.err.println("Não foi possível excluir o arquivo: " + e.getMessage());
