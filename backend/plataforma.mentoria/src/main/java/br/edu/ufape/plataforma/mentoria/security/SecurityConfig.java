@@ -2,6 +2,7 @@ package br.edu.ufape.plataforma.mentoria.security;
 
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,24 +32,30 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        final String MENTOR_PATH = "/mentor/**";
-        final String MENTORED_PATH = "/mentored/**";
+        final String MENTOR_PATH = "/api/mentor/**";
+        final String MENTORED_PATH = "/api/mentored/**";
 
         return httpSecurity.csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .headers(headers -> headers.frameOptions(org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint()))
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(new AntPathRequestMatcher("/api/materiais/**")).permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.POST, MENTOR_PATH, MENTORED_PATH).authenticated()
-                .requestMatchers(org.springframework.http.HttpMethod.PUT, MENTOR_PATH, MENTORED_PATH).authenticated()
-                .requestMatchers(org.springframework.http.HttpMethod.DELETE, MENTOR_PATH, MENTORED_PATH).authenticated()
-                .requestMatchers(org.springframework.http.HttpMethod.GET, "/avaliacoes").hasRole("ADMIN")
-                .anyRequest().permitAll()
-            )
-            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .headers(headers -> headers.frameOptions(
+                        org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint()))
+                .authorizeHttpRequests(authorize -> authorize
+                        // Permitir apenas GET para materiais sem autenticação
+                        .requestMatchers(HttpMethod.GET, "/api/materials/**").authenticated()
+                        // Exigir autenticação para operações de escrita
+                        .requestMatchers(HttpMethod.POST, "/api/materials/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/materials/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/materials/**").authenticated()
+
+                        .requestMatchers(HttpMethod.POST, MENTOR_PATH, MENTORED_PATH).authenticated()
+                        .requestMatchers(HttpMethod.PUT, MENTOR_PATH, MENTORED_PATH).authenticated()
+                        .requestMatchers(HttpMethod.DELETE, MENTOR_PATH, MENTORED_PATH).authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/avaliacoes").hasRole("ADMIN")
+                        .anyRequest().permitAll())
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean
@@ -71,9 +77,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:4200",
-            "https://plataforma-de-mentoria-frontend.onrender.com"
-        ));
+                "http://localhost:4200",
+                "https://plataforma-de-mentoria-frontend.onrender.com"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

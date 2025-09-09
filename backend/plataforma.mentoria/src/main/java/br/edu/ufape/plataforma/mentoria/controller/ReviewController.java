@@ -1,7 +1,6 @@
 package br.edu.ufape.plataforma.mentoria.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,7 @@ import br.edu.ufape.plataforma.mentoria.service.ReviewService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/avaliacoes")
+@RequestMapping("/api/avaliacoes")
 public class ReviewController {
 
     private final ReviewService reviewService;
