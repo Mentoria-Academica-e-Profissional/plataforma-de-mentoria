@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ProfileService, ProfileData } from './profile.service';
 import { EditMentoredModalComponent } from '../auth/edit-mentored-profile-modal/edit-mentored-modal.component';
 import { EditMentorProfileModalComponent } from '../auth/edit-mentor-profile-modal/edit-mentor-profile-modal.component';
 import { DeleteMentorModalComponent } from '../auth/delete-mentor-modal/delete-mentor-modal.component';
 import { DeleteMentoredModalComponent } from '../auth/delete-mentored-modal/delete-mentored-modal.component';
 import { AuthService } from '../auth/auth.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-perfil',
@@ -24,16 +23,22 @@ import { Router } from '@angular/router';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
+  private profileService = inject(ProfileService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   profileData: ProfileData | null = null;
   loading = true;
   error: string | null = null;
   showEditModal = false;
   showDeleteModal = false;
 
-  constructor(private profileService: ProfileService, private authService: AuthService,   private router: Router) {}
-
   ngOnInit(): void {
     this.loadProfile();
+  }
+
+  goBack(): void {
+    this.router.navigate(['/home']);
   }
 
   loadProfile(): void {
@@ -241,9 +246,5 @@ private formatInterestAreaName(area: string): string {
 
   getCourseName(course: string): string {
     return this.courseMap[course] || course || 'Não informado';
-  }
-
-  goBack(): void {
-    this.router.navigate(['/home']);
   }
 }

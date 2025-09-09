@@ -1,32 +1,15 @@
 <div class="page-wrapper">
   <div class="container">
-    <!-- Botão de voltar -->
-    <button class="back-button" (click)="goBack()">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-      >
-        <path
-          d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
-        />
-      </svg>
-      Voltar
-    </button>
-
-    <!-- Loading State -->
     <div *ngIf="loading" class="loading">
       <div class="spinner"></div>
       Carregando perfil...
     </div>
 
-    <!-- Error State -->
     <div *ngIf="error" class="error">
       <p>Erro ao carregar o perfil. Tente novamente.</p>
       <button class="btn btn-primary" (click)="loadProfile()">Tentar novamente</button>
     </div>
 
-    <!-- Profile Content -->
     <div *ngIf="!loading && !error && profileData" id="profileContent">
       <div class="header">
         <div class="profile-avatar">{{ getInitials() }}</div>
@@ -36,9 +19,7 @@
       </div>
 
       <div class="content">
-        <!-- View Mode -->
         <div *ngIf="!showEditModal" class="view-mode">
-          <!-- Layout para MENTOR -->
           <div *ngIf="profileData.type === 'MENTOR'" class="info-grid">
             <div class="info-item">
               <label class="info-label">Nome Completo</label>
@@ -72,7 +53,6 @@
               </div>
             </div>
 
-            <!-- ÁREAS DE INTERESSE COM O MESMO ESTILO DAS ESPECIALIZAÇÕES -->
             <div class="info-item full-width">
               <label class="info-label">Áreas de Interesse</label>
               <div class="specializations-container">
@@ -87,7 +67,6 @@
 
           </div>
 
-          <!-- Layout para MENTORADO -->
           <div *ngIf="profileData.type === 'MENTORADO'" class="info-grid">
             <div class="info-item">
               <label class="info-label">Nome Completo</label>
@@ -122,13 +101,11 @@
     </div>
   </div>
 
-  <!-- Botão de excluir fixo no canto inferior direito -->
   <button *ngIf="!loading && !error && profileData" class="delete-button" (click)="openDeleteModal()">
     <span class="delete-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span>
     Excluir Perfil
   </button>
 
-  <!-- Modais -->
   <app-edit-mentor-profile-modal
     *ngIf="showEditModal && profileData?.type === 'MENTOR'"
     [mentor]="profileData?.data || {}"
