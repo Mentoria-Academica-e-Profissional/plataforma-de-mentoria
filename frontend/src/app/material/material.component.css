@@ -1,0 +1,102 @@
+:host {
+  --primary-color: #3B82F6; --primary-dark-color: #2563EB;
+  --text-color: #1F2937; --text-light-color: #6B7280;
+  --surface-color: #FFFFFF; --background-color: #F9FAFB;
+  --border-color: #E5E7EB; --danger-color: #EF4444; --success-color: #10B981;
+}
+.library-container { max-width: 1200px; margin: 0 auto; padding: 2rem; font-family: sans-serif; background-color: var(--background-color); min-height: 100vh; }
+
+/* Cabeçalho */
+.library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.header-title { display: flex; align-items: center; gap: 1rem; }
+.btn-back { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-light-color); transition: all 0.2s; }
+.btn-back:hover { background-color: #F3F4F6; color: var(--text-color); }
+.library-header h1 { font-size: 2rem; font-weight: 700; color: var(--text-color); margin: 0; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; border-radius: 6px; padding: 10px 16px; border: none; cursor: pointer; transition: all 0.2s; }
+.btn svg { width: 16px; height: 16px; }
+.btn-primary { background-color: var(--primary-color); color: white; }
+.btn-primary:hover { background-color: var(--primary-dark-color); }
+.btn-secondary { background-color: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color); }
+.btn-secondary:hover { background-color: var(--background-color); }
+
+/* Filtros */
+.filter-section-wrapper { margin-bottom: 2rem; }
+.filter-toggle-button { width: 100%; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-size: 1rem; color: var(--text-light-color); text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.filter-toggle-button span { display: flex; align-items: center; gap: 8px; }
+.filter-toggle-button svg { width: 18px; height: 18px; }
+.chevron { transition: transform 0.3s ease; }
+.chevron.rotated { transform: rotate(180deg); }
+.filter-tags-container { padding: 1.5rem; display: flex; flex-wrap: wrap; gap: 12px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; }
+.filter-tag { background-color: #F3F4F6; color: #4B5563; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: 500; border: none; cursor: pointer; }
+.filter-tag.active { background-color: var(--primary-color); color: white; }
+.clear-filters-btn { background: none; border: none; color: var(--primary-color); text-decoration: underline; cursor: pointer; margin-left: auto; }
+
+/* Grid e Cards */
+.grid-container { min-height: 200px; }
+.materials-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.material-card { background: var(--surface-color); border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
+.card-content { padding: 1.25rem; flex-grow: 1; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.card-type { background-color: #E0E7FF; color: #4338CA; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+.material-card h3 { font-size: 1.2rem; font-weight: 600; color: var(--text-color); margin: 0; }
+.card-info { font-size: 0.875rem; color: var(--text-light-color); margin: 4px 0 1rem 0; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { background-color: #F3F4F6; color: #4B5563; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; }
+.card-footer { padding: 0.75rem 1.25rem; border-top: 1px solid var(--border-color); }
+.btn-view.full-width { width: 100%; justify-content: center; }
+
+/* Menu de Ações */
+.action-menu-container { position: relative; }
+.action-menu-trigger { background: none; border: none; cursor: pointer; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: var(--text-light-color); }
+.action-menu-trigger:hover { background-color: var(--background-color); }
+.action-menu-dropdown { position: absolute; top: 100%; right: 0; background: var(--surface-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid var(--border-color); z-index: 10; width: 150px; }
+.action-menu-dropdown button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 15px; background: none; border: none; text-align: left; cursor: pointer; font-size: 0.9rem; }
+.action-menu-dropdown button:hover { background-color: var(--background-color); }
+.action-menu-dropdown button svg { width: 16px; height: 16px; color: var(--text-light-color); }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: var(--surface-color); border-radius: 8px; width: 90%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; }
+.modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+.modal-header h2 { font-size: 1.25rem; font-weight: 600; margin: 0; }
+.close-button { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-light-color); }
+.modal-body { padding: 1.5rem; overflow-y: auto; }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; font-weight: 500; margin-bottom: 8px; color: #333; }
+.form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+input[type="file"] { display: none; }
+.btn-upload { width: 100%; padding: 10px; border: 1px dashed var(--border-color); background: var(--background-color); border-radius: 6px; cursor: pointer; }
+.btn-upload svg { width: 18px; height: 18px; }
+.file-name { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--success-color); font-weight: 500; }
+.form-actions { display: flex; justify-content: flex-end; gap: 1rem; padding: 1.5rem; border-top: 1px solid var(--border-color); }
+
+/* Estados Vazios e de Carregamento */
+.empty-state, .loading-state { text-align: center; padding: 4rem; color: var(--text-light-color); }
+
+/* --- Estilos para Dropdown Customizado --- */
+.custom-dropdown { position: relative; }
+.dropdown-toggle { width: 100%; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; font-size: 14px; color: var(--text-color); text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.dropdown-toggle span { flex-grow: 1; }
+.dropdown-menu { position: absolute; top: 100%; left: 0; right: 0; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1010; margin-top: 4px; max-height: 200px; overflow-y: auto; }
+.dropdown-menu a { display: block; padding: 10px 12px; cursor: pointer; text-decoration: none; color: var(--text-color); }
+.dropdown-menu a:hover { background-color: var(--background-color); }
+
+/* Estilos de Categoria como em Editar Perfil */
+.field-description { font-size: 12px; color: #666; margin-bottom: 12px; font-style: italic; }
+.checkbox-grid { border: 1px solid #e0e0e0; border-radius: 6px; max-height: 250px; overflow-y: auto; overflow-x: hidden; }
+.checkbox-grid::-webkit-scrollbar { width: 6px; }
+.checkbox-grid::-webkit-scrollbar-track { background: #f8f9fa; }
+.checkbox-grid::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 3px; }
+.checkbox-section { border-bottom: 1px solid #e0e0e0; }
+.checkbox-section:last-child { border-bottom: none; }
+.section-header { padding: 12px 16px; background-color: #f8f9fa; margin: 0; font-size: 14px; font-weight: 600; color: #495057; cursor: pointer; display: flex; align-items: center; user-select: none; transition: background-color 0.2s ease; }
+.section-header:hover { background-color: #e9ecef; }
+.expand-icon { margin-right: 8px; transition: transform 0.2s ease; font-size: 12px; }
+.expand-icon.expanded { transform: rotate(90deg); }
+.section-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; background-color: white; }
+.section-content.expanded { max-height: 400px; }
+.checkbox-item { padding: 8px 16px; display: flex; align-items: center; border-bottom: 1px solid #f0f0f0; }
+.checkbox-item:last-child { border-bottom: none; }
+.checkbox-item input[type="checkbox"] { margin-right: 8px; width: auto; }
+.checkbox-item label { font-size: 13px; color: #495057; cursor: pointer; margin: 0; flex: 1; font-weight: normal; }
+.error { color: #dc3545; font-size: 12px; margin-top: 4px; }

@@ -7,6 +7,46 @@
   border-radius: 16px;
 }
 
+/* --- CABEÇALHOS COMUNS --- */
+.history-header,
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.history-header {
+  padding-bottom: 1rem;
+}
+
+.history-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2a3b6e;
+}
+
+.page-header {
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.header-title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-title-container h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2a3b6e;
+  margin: 0;
+}
+
+/* --- BOTÃO DE VOLTAR --- */
 .back-button {
   position: absolute;
   top: 20px;
@@ -37,7 +77,7 @@
   height: 20px;
 }
 
-/* Session Cards */
+/* --- LISTA DE CARDS --- */
 .session-list {
   display: flex;
   flex-direction: column;
@@ -58,11 +98,32 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
+.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable:hover {
+  background-color: rgba(79, 70, 229, 0.05);
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.expand-icon {
+  color: #6b7280;
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
 }
 
 .session-topic {
@@ -71,7 +132,7 @@
   color: #2a3b6e;
 }
 
-/* Status Tags */
+/* --- TAGS DE STATUS --- */
 .status-tag {
   padding: 0.25rem 0.75rem;
   border-radius: 16px;
@@ -87,7 +148,7 @@
 .status-completed { background: #3b82f6; }
 .status-cancelled { background: #6b7280; }
 
-/* Card Details & Actions */
+/* --- DETALHES E AÇÕES DO CARD --- */
 .card-body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -128,11 +189,14 @@
   color: white;
 }
 
-.action-button:hover { opacity: 0.85; }
-.action-button.accept { background: #10b981; }
-.action-button.reject { background: #ef4444; }
-.action-button.complete { background: #3b82f6; }
-.action-button.cancel { background: #6b7280; }
+.action-button:hover {
+  opacity: 0.85;
+}
+
+.action-button.accept { background-color: #10b981; }
+.action-button.reject { background-color: #ef4444; }
+.action-button.complete { background-color: #3b82f6; }
+.action-button.cancel { background-color: #6b7280; }
 
 .no-sessions {
   text-align: center;
@@ -140,7 +204,7 @@
   color: #6c757d;
 }
 
-/* Filters */
+/* --- SEÇÃO DE FILTROS --- */
 .filter-section {
   background: white;
   border-radius: 12px;
@@ -174,8 +238,14 @@
   transition: all 0.2s;
 }
 
-.filter-control-btn:hover:not(:disabled) { background: #e5e7eb; }
-.filter-control-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.filter-control-btn:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.filter-control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 .status-filters {
   display: grid;
@@ -193,9 +263,11 @@
   transition: background-color 0.2s;
 }
 
-.filter-checkbox:hover { background-color: #f9fafb; }
+.filter-checkbox:hover {
+  background-color: #f9fafb;
+}
 
-/* Checkbox & Results */
+/* --- CHECKBOX E RESULTADOS --- */
 .filter-checkbox input[type="checkbox"] {
   appearance: none;
   width: 18px;
@@ -250,10 +322,13 @@
   font-weight: 500;
 }
 
-/* Messages & Reviews */
-.message-section { margin: 1rem 0; }
+/* --- MENSAGENS E AVALIAÇÕES --- */
+.message-section {
+  margin: 1rem 0;
+}
 
-.success-message, .error-message {
+.success-message,
+.error-message {
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -269,7 +344,10 @@
   color: #047857;
 }
 
-.success-message::before { content: "✅"; font-size: 1.1rem; }
+.success-message::before {
+  content: "✅";
+  font-size: 1.1rem;
+}
 
 .error-message {
   background: #fee2e2;
@@ -277,25 +355,9 @@
   color: #dc2626;
 }
 
-.error-message::before { content: "⚠️"; font-size: 1.1rem; }
-
-.clickable {
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.clickable:hover { background-color: rgba(79, 70, 229, 0.05); }
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.expand-icon {
-  color: #6b7280;
-  font-size: 0.875rem;
-  transition: transform 0.2s ease;
+.error-message::before {
+  content: "⚠️";
+  font-size: 1.1rem;
 }
 
 .review-hint {
@@ -309,27 +371,22 @@
   margin: 0;
 }
 
-/* Form Sections */
-.review-section, .status-update-section, .already-reviewed-section {
+/* --- SEÇÕES DE FORMULÁRIO --- */
+.review-section,
+.status-update-section,
+.already-reviewed-section {
   border-top: 1px solid #e5e7eb;
   padding: 1.5rem;
   margin-top: 1rem;
   border-radius: 0 0 12px 12px;
 }
 
-.review-section {
-  background: #f9fafb;
-}
+.review-section { background: #f9fafb; }
+.status-update-section { background: #fef3c7; }
+.already-reviewed-section { background: #f0f9ff; }
 
-.status-update-section {
-  background: #fef3c7;
-}
-
-.already-reviewed-section {
-  background: #f0f9ff;
-}
-
-.review-section h4, .status-update-section h4 {
+.review-section h4,
+.status-update-section h4 {
   margin: 0 0 1.5rem 0;
   font-size: 1.125rem;
   font-weight: 600;
@@ -368,9 +425,12 @@
   user-select: none;
 }
 
-.star-btn:hover, .star-btn.active { color: #fbbf24; }
+.star-btn:hover,
+.star-btn.active {
+  color: #fbbf24;
+}
 
-/* Form Controls */
+/* --- CONTROLES DE FORMULÁRIO --- */
 .rating-display {
   font-size: 0.875rem;
   color: #374151;
@@ -378,7 +438,8 @@
   font-weight: 500;
 }
 
-textarea, .status-select {
+textarea,
+.status-select {
   width: 100%;
   padding: 0.75rem;
   border: 2px solid #e5e7eb;
@@ -399,13 +460,16 @@ textarea {
   cursor: pointer;
 }
 
-textarea:focus, .status-select:focus {
+textarea:focus,
+.status-select:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.status-select:focus { border-color: #f59e0b; }
+.status-select:focus {
+  border-color: #f59e0b;
+}
 
 .char-count {
   display: block;
@@ -421,7 +485,8 @@ textarea:focus, .status-select:focus {
   gap: 0.75rem;
 }
 
-.submit-btn, .status-update-btn {
+.submit-btn,
+.status-update-btn {
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -454,14 +519,15 @@ textarea:focus, .status-select:focus {
   box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
 }
 
-.submit-btn:disabled, .status-update-btn:disabled {
+.submit-btn:disabled,
+.status-update-btn:disabled {
   background: #9ca3af;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
-/* Already Reviewed Message */
+/* --- MENSAGEM DE AVALIAÇÃO EXISTENTE --- */
 .already-reviewed-message {
   text-align: center;
   color: #0369a1;
@@ -481,7 +547,34 @@ textarea:focus, .status-select:focus {
   opacity: 0.8;
 }
 
-/* Mobile Responsive */
+/* --- BOTÃO GENÉRICO --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-primary {
+  background-color: #3B82F6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2563EB;
+}
+
+/* --- DESIGN RESPONSIVO --- */
 @media (max-width: 768px) {
   .status-filters { grid-template-columns: 1fr; }
   .filter-controls { flex-direction: column; }

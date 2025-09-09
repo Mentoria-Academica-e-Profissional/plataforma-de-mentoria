@@ -36,11 +36,10 @@ public class MentorController {
     private final MentorMapper mentorMapper;
 
     public MentorController(
-        MentorServiceInterface mentorService,
-        MentoredSearchServiceInterface mentoredSearchService,
-        MentorSearchServiceInterface mentorSearchService,
-        MentorMapper mentorMapper
-    ) {
+            MentorServiceInterface mentorService,
+            MentoredSearchServiceInterface mentoredSearchService,
+            MentorSearchServiceInterface mentorSearchService,
+            MentorMapper mentorMapper) {
         this.mentorService = mentorService;
         this.mentoredSearchService = mentoredSearchService;
         this.mentorSearchService = mentorSearchService;
@@ -62,18 +61,19 @@ public class MentorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMentorDTO);
     }
 
-     @PutMapping("/{idMentor}")
-     public ResponseEntity<MentorDTO> updateMentor(@PathVariable Long idMentor,
-            @Valid @RequestBody MentorDTO mentorDTO){
+    @PutMapping("/{idMentor}")
+    public ResponseEntity<MentorDTO> updateMentor(@PathVariable Long idMentor,
+            @Valid @RequestBody MentorDTO mentorDTO) {
         MentorDTO updatedMentorDTO = mentorService.updateMentor(idMentor, mentorDTO);
-         if (updatedMentorDTO == null) {
+        if (updatedMentorDTO == null) {
             return ResponseEntity.notFound().build();
-         }
-         return ResponseEntity.ok(updatedMentorDTO);
+        }
+        return ResponseEntity.ok(updatedMentorDTO);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<MentorDTO> updateMentor(@PathVariable Long id, @RequestBody @Valid UpdateMentorDTO updateMentorDTO) {
+    public ResponseEntity<MentorDTO> updateMentor(@PathVariable Long id,
+            @RequestBody @Valid UpdateMentorDTO updateMentorDTO) {
         Mentor updatedMentor = mentorService.updateMentor(id, updateMentorDTO);
         MentorDTO dto = mentorMapper.toDTO(updatedMentor);
         return ResponseEntity.ok(dto);
@@ -91,7 +91,7 @@ public class MentorController {
 
     @GetMapping("/mentoreds/search")
     public ResponseEntity<List<MentoredDTO>> searchMentored(
-            @RequestParam(required = false) String interestArea){
+            @RequestParam(required = false) String interestArea) {
 
         if (interestArea == null || interestArea.isBlank()) {
             return ResponseEntity.ok(Collections.emptyList());
@@ -109,7 +109,7 @@ public class MentorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MentorDTO>> getAllMentors(){
+    public ResponseEntity<List<MentorDTO>> getAllMentors() {
         List<Mentor> results = mentorSearchService.getAllMentors();
         List<MentorDTO> dtos = results.stream().map(mentorMapper::toDTO).toList();
         return ResponseEntity.ok(dtos);

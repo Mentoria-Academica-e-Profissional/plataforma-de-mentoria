@@ -96,6 +96,10 @@ export class SessionHistoryComponent implements OnInit {
     });
   }
 
+  navigateTo(path: string): void {
+    this.router.navigate([path]);
+  }
+
   loadSessionHistory(): void {
     this.profileService.getSessionHistory().subscribe({
       next: (data) => {

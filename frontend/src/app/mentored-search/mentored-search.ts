@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../profile/profile.service';
 import { Mentor } from '../entity/mentor';
+import { of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-mentored-search',
@@ -14,30 +16,14 @@ import { Mentor } from '../entity/mentor';
 export class MentoredSearchComponent {
   mentors: Mentor[] = [];
   mentorSearchPerformed = false;
-  selectedInterestArea: string = '';
+  
+  // --- UI State ---
+  isInterestMenuOpen = false;
+  private searchDebounceTimer: any;
+
+  // --- Filtros ---
+  selectedInterestAreas: string[] = [];
   specializationsInput: string = '';
-
-  // Limpa busca ao mudar área de interesse
-  onInterestAreaChange() {
-    this.mentors = [];
-    this.mentorSearchPerformed = false;
-  }
-  // Limpa busca ao mudar especialização
-  onSpecializationsInputChange() {
-    this.mentors = [];
-    this.mentorSearchPerformed = false;
-  }
-
-  // Controle de etapas para UI dinâmica
-  get step1Active(): boolean {
-    return !!this.selectedInterestArea;
-  }
-  get step2Active(): boolean {
-    return this.step1Active && !!this.specializationsInput.trim();
-  }
-  get step3Active(): boolean {
-    return this.step2Active && this.mentorSearchPerformed;
-  }
 
   interestAreas = [
     { value: 'TECNOLOGIA_DA_INFORMACAO', label: 'Tecnologia da Informação' },
@@ -45,7 +31,7 @@ export class MentoredSearchComponent {
     { value: 'CIENCIA_DE_DADOS_E_IA', label: 'Ciência de Dados e Inteligência Artificial' },
     { value: 'CIBERSEGURANCA', label: 'Cibersegurança' },
     { value: 'UX_UI_DESIGN', label: 'UX/UI Design' },
-    { value: 'ENGENHARIA_GERAL', label: 'Engenharia' },
+    { value: 'ENGENHARIA_GERAL', label: 'Engenharia Geral' },
     { value: 'ENGENHARIA_CIVIL', label: 'Engenharia Civil' },
     { value: 'ENGENHARIA_DE_PRODUCAO', label: 'Engenharia de Produção' },
     { value: 'MATEMATICA_E_ESTATISTICA', label: 'Matemática e Estatística' },
@@ -66,30 +52,98 @@ export class MentoredSearchComponent {
     { value: 'NUTRICAO', label: 'Nutrição' },
     { value: 'BIOTECNOLOGIA', label: 'Biotecnologia' },
     { value: 'EDUCACAO', label: 'Educação' },
-    { value: 'ARTES_E_DESIGN', label: 'Artes e Design' },
     { value: 'CIENCIAS_HUMANAS_E_SOCIAIS', label: 'Ciências Humanas e Sociais' },
     { value: 'LETRAS', label: 'Letras' },
     { value: 'HISTORIA', label: 'História' },
     { value: 'GEOGRAFIA', label: 'Geografia' },
-    { value: 'SOCIOLOGIA', label: 'Sociologia' }
+    { value: 'SOCIOLOGIA', label: 'Sociologia' },
+    { value: 'JURIDICO', label: 'Jurídico' },
+    { value: 'DIREITO_DIGITAL', label: 'Direito Digital' },
+    { value: 'MEIO_AMBIENTE_E_SUSTENTABILIDADE', label: 'Meio Ambiente e Sustentabilidade' }
   ];
 
-  constructor(private profileService: ProfileService) {}
+  constructor(private profileService: ProfileService, private elementRef: ElementRef) {}
 
-  onMentorSearch(): void {
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.elementRef.nativeElement.querySelector('.dropdown-container')?.contains(event.target)) {
+      this.isInterestMenuOpen = false;
+    }
+  }
+
+  toggleInterestMenu(event: MouseEvent) {
+    event.stopPropagation();
+    this.isInterestMenuOpen = !this.isInterestMenuOpen;
+  }
+  
+  onSearchDebounced() {
+    clearTimeout(this.searchDebounceTimer);
+    this.searchDebounceTimer = setTimeout(() => {
+      this.onSearch();
+    }, 500);
+  }
+  
+  onSearch(): void {
     const specializations = this.specializationsInput
       ? this.specializationsInput.split(',').map(s => s.trim()).filter(Boolean)
-      : undefined;
-    this.profileService.searchMentors(this.selectedInterestArea, specializations).subscribe({
-      next: (mentors) => {
-        this.mentors = mentors;
-        this.mentorSearchPerformed = true;
-      },
-      error: (err) => {
-        console.error('Erro ao buscar mentores:', err);
-        this.mentors = [];
-        this.mentorSearchPerformed = true;
-      }
-    });
+      : [];
+
+    if (this.selectedInterestAreas.length > 0 || specializations.length > 0) {
+      const interestArea = this.selectedInterestAreas.length > 0 ? this.selectedInterestAreas[0] : undefined;
+
+      this.profileService.searchMentors(interestArea, specializations).subscribe({
+        next: (mentors) => {
+          this.mentors = mentors;
+          this.mentorSearchPerformed = true;
+        },
+        error: (err) => {
+          console.error('Erro ao buscar mentores:', err);
+          this.mentors = [];
+          this.mentorSearchPerformed = true;
+        }
+      });
+    } else {
+      this.mentors = [];
+      this.mentorSearchPerformed = false;
+    }
+  }
+
+  toggleAreaSelection(area: string): void {
+    const index = this.selectedInterestAreas.indexOf(area);
+    if (index > -1) {
+      this.selectedInterestAreas.splice(index, 1);
+    } else {
+      this.selectedInterestAreas.push(area);
+    }
+    this.onSearch();
+  }
+
+  isAreaSelected(area: string): boolean {
+    return this.selectedInterestAreas.includes(area);
+  }
+
+  clearInterestAreas(): void {
+    this.selectedInterestAreas = [];
+    this.onSearch();
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '';
+    const names = name.trim().split(' ');
+    const firstInitial = names[0]?.[0] || '';
+    const lastInitial = names.length > 1 ? names[names.length - 1]?.[0] : '';
+    return (firstInitial + lastInitial).toUpperCase();
+  }
+  
+  private courseMap: { [key: string]: string } = {
+      'ADMINISTRACAO': 'Administração', 'DIREITO': 'Direito', 'MEDICINA': 'Medicina', 'ENGENHARIA_CIVIL': 'Engenharia Civil',
+      'CIENCIA_DA_COMPUTACAO': 'Ciência da Computação', 'PSICOLOGIA': 'Psicologia', 'ENFERMAGEM': 'Enfermagem',
+      'ARQUITETURA_E_URBANISMO': 'Arquitetura e Urbanismo', 'CONTABILIDADE': 'Ciências Contábeis', 'ODONTOLOGIA': 'Odontologia',
+      'PEDAGOGIA': 'Pedagogia', 'FISIOTERAPIA': 'Fisioterapia', 'NUTRICIONISMO': 'Nutrição', 'EDUCACAO_FISICA': 'Educação Física',
+      'VETERINARIA': 'Medicina Veterinária', 'ZOOTECNIA': 'Zootecnia', 'LETRAS': 'Letras'
+  };
+
+  getCourseName(courseKey: string): string {
+    return this.courseMap[courseKey] || courseKey;
   }
 }

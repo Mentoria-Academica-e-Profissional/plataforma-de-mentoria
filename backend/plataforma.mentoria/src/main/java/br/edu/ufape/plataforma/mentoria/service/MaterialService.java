@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +41,14 @@ public class MaterialService {
     private final MentorRepository mentorRepository;
     private final MaterialMapper materialMapper;
     private final Path uploadDir;
+
+    // Padrão para caracteres permitidos no nome do arquivo
+    private static final Pattern SAFE_FILENAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]+$");
+    
+    // Extensões permitidas
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
+        ".pdf", ".doc", ".docx", ".txt", ".jpg", ".jpeg", ".png", ".mp4", ".avi", ".mov"
+    );
 
     public MaterialService(MaterialRepository materialRepository,
                            UserRepository userRepository,
@@ -70,6 +78,68 @@ public class MaterialService {
         }
     }
 
+    /**
+     * Sanitiza o nome do arquivo removendo caracteres perigosos e validando a extensão
+     */
+    private String sanitizeFilename(String originalFilename) {
+        if (originalFilename == null || originalFilename.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nome do arquivo não pode estar vazio");
+        }
+        
+        // Remove path separators e caracteres perigosos
+        String sanitized = originalFilename.replaceAll("[/\\\\:*?\"<>|]", "_");
+        
+        // Remove sequências de pontos que podem ser usadas para path traversal
+        sanitized = sanitized.replaceAll("\\.{2,}", ".");
+        
+        // Remove espaços no início e fim
+        sanitized = sanitized.trim();
+        
+        // Verifica se tem extensão válida
+        String extension = getFileExtension(sanitized).toLowerCase();
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            throw new IllegalArgumentException("Extensão de arquivo não permitida: " + extension);
+        }
+        
+        // Limita o tamanho do nome
+        if (sanitized.length() > 255) {
+            sanitized = sanitized.substring(0, 255);
+        }
+        
+        return sanitized;
+    }
+    
+    /**
+     * Extrai a extensão do arquivo
+     */
+    private String getFileExtension(String filename) {
+        int lastDotIndex = filename.lastIndexOf('.');
+        return lastDotIndex > 0 ? filename.substring(lastDotIndex) : "";
+    }
+    
+    /**
+     * Cria um nome de arquivo seguro usando UUID + nome sanitizado
+     */
+    private String createSecureFilename(String originalFilename) {
+        String sanitizedName = sanitizeFilename(originalFilename);
+        String uuid = UUID.randomUUID().toString();
+        return uuid + "_" + sanitizedName;
+    }
+    
+    /**
+     * Valida se o caminho final está dentro do diretório de upload permitido
+     */
+    private Path validateAndResolvePath(String filename) throws IOException {
+        Path resolvedPath = uploadDir.resolve(filename).normalize();
+        
+        // Verifica se o caminho final ainda está dentro do diretório de upload
+        if (!resolvedPath.startsWith(uploadDir.toAbsolutePath().normalize())) {
+            throw new SecurityException("Tentativa de path traversal detectada");
+        }
+        
+        return resolvedPath;
+    }
+
     public MaterialDTO createMaterial(MaterialDTO materialDTO, MultipartFile arquivo, Long userID) throws IOException {
         logger.debug("Criando material para usuário ID: {}", userID);
 
@@ -77,9 +147,27 @@ public class MaterialService {
                 .orElseThrow(() -> new EntityNotFoundException(User.class, userID));
 
         Material material = materialMapper.toEntity(materialDTO);
+        
+        if (material.getMaterialType() == MaterialType.LINK) {
+            material.setFilePath(null);
+        }
+        else if ((material.getMaterialType() == MaterialType.VIDEO ||
+                material.getMaterialType() == MaterialType.DOCUMENTO) &&
+                arquivo != null && !arquivo.isEmpty()) {
+            
+            // Validação de tamanho do arquivo (exemplo: máximo 50MB)
+            if (arquivo.getSize() > 50 * 1024 * 1024) {
+                throw new IllegalArgumentException("Arquivo muito grande. Máximo permitido: 50MB");
+            }
+            
+            String nomeArquivoSeguro = createSecureFilename(arquivo.getOriginalFilename());
+            Path caminhoCompleto = validateAndResolvePath(nomeArquivoSeguro);
+            
+            Files.copy(arquivo.getInputStream(), caminhoCompleto);
+            material.setFilePath(caminhoCompleto.toString());
+        }
+        
         material.setUserUploader(user);
-
-        processFileUpload(material, arquivo);
 
         Material materialSalvo = materialRepository.save(material);
         logger.info("Material criado com sucesso. ID: {}", materialSalvo.getId());
@@ -112,8 +200,40 @@ public class MaterialService {
         updatedMaterial.setId(id);
         updatedMaterial.setUserUploader(existingMaterial.getUserUploader());
 
-        handleFileUpdate(existingMaterial, updatedMaterial, arquivo);
-
+        if (updatedMaterial.getMaterialType() == MaterialType.LINK) {
+            updatedMaterial.setFilePath(null);
+        }
+        else if ((updatedMaterial.getMaterialType() == MaterialType.VIDEO ||
+                updatedMaterial.getMaterialType() == MaterialType.DOCUMENTO) &&
+                arquivo != null && !arquivo.isEmpty()) {
+            
+            // Validação de tamanho do arquivo
+            if (arquivo.getSize() > 50 * 1024 * 1024) {
+                throw new IllegalArgumentException("Arquivo muito grande. Máximo permitido: 50MB");
+            }
+            
+            // Remove arquivo antigo se existir
+            if (existingMaterial.getFilePath() != null) {
+                try {
+                    Path oldPath = Paths.get(existingMaterial.getFilePath());
+                    // Valida se o arquivo antigo está no diretório permitido antes de excluir
+                    if (oldPath.startsWith(uploadDir.toAbsolutePath().normalize())) {
+                        Files.deleteIfExists(oldPath);
+                    }
+                } catch (IOException e) {
+                    System.err.println("Não foi possível excluir o arquivo antigo: " + e.getMessage());
+                }
+            }
+            
+            String nomeArquivoSeguro = createSecureFilename(arquivo.getOriginalFilename());
+            Path caminhoCompleto = validateAndResolvePath(nomeArquivoSeguro);
+            
+            Files.copy(arquivo.getInputStream(), caminhoCompleto);
+            updatedMaterial.setFilePath(caminhoCompleto.toString());
+        } else {
+            updatedMaterial.setFilePath(existingMaterial.getFilePath());
+        }
+        
         Material materialSalvo = materialRepository.save(updatedMaterial);
         logger.info("Material atualizado com sucesso. ID: {}", id);
 
@@ -125,8 +245,20 @@ public class MaterialService {
 
         Material material = materialRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Material.class, id));
-
-        deleteFileIfExists(material.getFilePath());
+                
+        if (material.getFilePath() != null) {
+            try {
+                Path filePath = Paths.get(material.getFilePath());
+                // Valida se o arquivo está no diretório permitido antes de excluir
+                if (filePath.startsWith(uploadDir.toAbsolutePath().normalize())) {
+                    Files.deleteIfExists(filePath);
+                } else {
+                    System.err.println("Tentativa de exclusão de arquivo fora do diretório permitido: " + material.getFilePath());
+                }
+            } catch (IOException e) {
+                System.err.println("Não foi possível excluir o arquivo: " + e.getMessage());
+            }
+        }
         materialRepository.delete(material);
 
         logger.info("Material deletado com sucesso. ID: {}", id);
@@ -163,57 +295,6 @@ public class MaterialService {
         }
 
         return getSuggestedMaterialsByInterestAreas(areasDeInteresse);
-    }
-
-    private void processFileUpload(Material material, MultipartFile arquivo) throws IOException {
-        if (material.getMaterialType() == MaterialType.LINK) {
-            material.setFilePath(null);
-            return;
-        }
-
-        if (isFileUploadRequired(material.getMaterialType()) && arquivo != null && !arquivo.isEmpty()) {
-            String filePath = saveUploadedFile(arquivo);
-            material.setFilePath(filePath);
-        }
-    }
-
-    private void handleFileUpdate(Material existingMaterial, Material updatedMaterial, MultipartFile arquivo) throws IOException {
-        if (updatedMaterial.getMaterialType() == MaterialType.LINK) {
-            deleteFileIfExists(existingMaterial.getFilePath());
-            updatedMaterial.setFilePath(null);
-        } else if (isFileUploadRequired(updatedMaterial.getMaterialType()) && arquivo != null && !arquivo.isEmpty()) {
-            deleteFileIfExists(existingMaterial.getFilePath());
-
-            String newFilePath = saveUploadedFile(arquivo);
-            updatedMaterial.setFilePath(newFilePath);
-        } else {
-            updatedMaterial.setFilePath(existingMaterial.getFilePath());
-        }
-    }
-
-    private boolean isFileUploadRequired(MaterialType materialType) {
-        return materialType == MaterialType.VIDEO || materialType == MaterialType.DOCUMENTO;
-    }
-
-    private String saveUploadedFile(MultipartFile arquivo) throws IOException {
-        String nomeArquivo = UUID.randomUUID().toString() + "_" + arquivo.getOriginalFilename();
-        Path caminhoCompleto = uploadDir.resolve(nomeArquivo);
-
-        Files.copy(arquivo.getInputStream(), caminhoCompleto, StandardCopyOption.REPLACE_EXISTING);
-        logger.debug("Arquivo salvo: {}", caminhoCompleto.toAbsolutePath());
-
-        return caminhoCompleto.toString();
-    }
-
-    private void deleteFileIfExists(String filePath) {
-        if (filePath != null) {
-            try {
-                Files.deleteIfExists(Paths.get(filePath));
-                logger.debug("Arquivo deletado: {}", filePath);
-            } catch (IOException e) {
-                logger.warn("Não foi possível excluir o arquivo: {}", filePath, e);
-            }
-        }
     }
 
     private Set<InterestArea> getUserInterestAreas(User usuario) {

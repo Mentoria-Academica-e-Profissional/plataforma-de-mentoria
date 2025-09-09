@@ -1,33 +1,51 @@
-<div class="mentor-search-center">
-  <form class="search-form">
-    <div class="form-group">
-      <label for="interestArea">Área de Interesse:</label>
-      <select [(ngModel)]="selectedInterestAreaMentor" name="interestArea" id="interestArea" class="form-control">
-        <option value="">Selecione uma área</option>
-        <option *ngFor="let area of interestAreas" [value]="area.value">{{ area.label }}</option>
-      </select>
-    </div>
-
-    <button type="submit" class="search-btn" (click)="onMentoredSearch()">
-      Buscar Mentorados
-    </button>
-  </form>
-
-  <!-- Resultados da busca -->
-  <div *ngIf="mentoredSearchPerformed" class="search-results">
-    <h3>Resultados da Busca</h3>
-
-    <div *ngIf="mentoreds.length === 0" class="no-results">
-      <p>Nenhum mentorado encontrado com os critérios especificados.</p>
-    </div>
-
-    <div *ngIf="mentoreds.length > 0" class="results-list">
-      <div *ngFor="let mentored of mentoreds" class="mentored-card">
-        <h4>{{ mentored.fullName }}</h4>
-        <p><strong>Curso:</strong> {{ mentored.course }}</p>
-        <p><strong>Área de Interesse:</strong> {{ mentored.interestArea }}</p>
-        <p *ngIf="mentored.academicSummary"><strong>Resumo Acadêmico:</strong> {{ mentored.academicSummary }}</p>
+<div class="search-page-container">
+  <header class="search-header">
+    <nav class="search-nav">
+      <div class="dropdown-container">
+        <button class="nav-button" (click)="toggleInterestMenu($event)">
+          <span>Mentorados</span>
+          <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </button>
+        <div class="dropdown-panel" *ngIf="isInterestMenuOpen">
+            <div class="panel-header">
+              <h4>Filtrar por área de interesse</h4>
+               <button class="clear-filters-btn" *ngIf="selectedInterestAreas.length > 0" (click)="clearInterestAreas()">Limpar</button>
+            </div>
+            <div class="filter-tags-container">
+              <button *ngFor="let area of interestAreas" class="filter-tag" [class.active]="isAreaSelected(area.value)" (click)="toggleAreaSelection(area.value)">
+                {{ area.label }}
+              </button>
+            </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </nav>
+  </header>
+
+  <main class="results-container" *ngIf="mentoredSearchPerformed">
+      <div *ngIf="mentoreds.length === 0" class="no-results">
+        <p>Nenhum mentorado encontrado para as áreas selecionadas.</p>
+      </div>
+
+       <div *ngIf="mentoreds.length > 0" class="results-grid">
+        <div *ngFor="let mentored of mentoreds" class="profile-card">
+          <div class="card-header">
+            <div class="card-avatar">{{ getInitials(mentored.fullName) }}</div>
+            <div class="card-title">
+              <h4>{{ mentored.fullName }}</h4>
+              <p>{{ getCourseName(mentored.course) }}</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="summary">{{ mentored.academicSummary | slice:0:150 }}{{ mentored.academicSummary.length > 150 ? '...' : '' }}</p>
+            <h5>Áreas de Interesse</h5>
+            <div class="tags-container">
+              <span *ngFor="let area of mentored.interestArea" class="tag">{{ interestAreaLabels[area] }}</span>
+              <span *ngIf="!mentored.interestArea || mentored.interestArea.length === 0" class="tag-empty">Nenhuma área informada</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  </main>
 </div>

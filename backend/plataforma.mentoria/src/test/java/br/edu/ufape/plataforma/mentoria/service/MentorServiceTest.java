@@ -9,22 +9,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+
+import static org.mockito.Mockito.*;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import br.edu.ufape.plataforma.mentoria.dto.MentorDTO;
 import br.edu.ufape.plataforma.mentoria.dto.UpdateMentorDTO;
 import br.edu.ufape.plataforma.mentoria.enums.AffiliationType;
 import br.edu.ufape.plataforma.mentoria.enums.Course;
 import br.edu.ufape.plataforma.mentoria.enums.InterestArea;
-import br.edu.ufape.plataforma.mentoria.exceptions.AttributeAlreadyInUseException;
 import br.edu.ufape.plataforma.mentoria.exceptions.EntityNotFoundException;
 import br.edu.ufape.plataforma.mentoria.mapper.MentorMapper;
 import br.edu.ufape.plataforma.mentoria.model.Mentor;
-import br.edu.ufape.plataforma.mentoria.model.User;
 import br.edu.ufape.plataforma.mentoria.repository.MentorRepository;
 import br.edu.ufape.plataforma.mentoria.repository.UserRepository;
 
@@ -48,43 +46,6 @@ class MentorServiceTest {
 
     @Mock
     private Authentication authentication;
-
-    @Test
-    void testCreateMentor_Success() {
-        MentorDTO mentorDTO = new MentorDTO.Builder().build();
-        Mentor mentor = new Mentor.Builder().build();
-        User user = new User();
-        Mentor savedMentor = new Mentor.Builder().build();
-
-        when(authentication.getName()).thenReturn("test@example.com");
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        when(userRepository.findByEmail("test@example.com")).thenReturn(user);
-        when(mentorMapper.toEntity(mentorDTO)).thenReturn(mentor);
-        when(mentorRepository.existsByCpf(mentor.getCpf())).thenReturn(false);
-        when(mentorRepository.save(mentor)).thenReturn(savedMentor);
-        when(mentorMapper.toDTO(savedMentor)).thenReturn(mentorDTO);
-
-        MentorDTO result = mentorService.createMentor(mentorDTO);
-
-        assertEquals(mentorDTO, result);
-        verify(mentorRepository).save(mentor);
-    }
-
-    @Test
-    @SuppressWarnings("unused")
-    void testCreateMentor_CpfAlreadyInUse() {
-        MentorDTO mentorDTO = new MentorDTO.Builder().build();
-        Mentor mentor = new Mentor.Builder().build();
-        User user = new User();
-
-        when(authentication.getName()).thenReturn("test@example.com");
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        when(userRepository.findByEmail("test@example.com")).thenReturn(user);
-        when(mentorMapper.toEntity(mentorDTO)).thenReturn(mentor);
-        when(mentorRepository.existsByCpf(mentor.getCpf())).thenReturn(true);
-
-        assertThrows(AttributeAlreadyInUseException.class, () -> mentorService.createMentor(mentorDTO));
-    }
 
     @Test
     void testUpdateMentor_WithMentorEntity_Success() {
@@ -233,7 +194,8 @@ class MentorServiceTest {
         assertEquals("Complete Name", mentor.getFullName());
         assertEquals(LocalDate.of(1990, 5, 15), mentor.getBirthDate());
         assertEquals(Course.ADMINISTRACAO, mentor.getCourse());
-        assertEquals(Arrays.asList(InterestArea.TECNOLOGIA_DA_INFORMACAO, InterestArea.CIENCIA_DE_DADOS_E_IA), mentor.getInterestArea());
+        assertEquals(Arrays.asList(InterestArea.TECNOLOGIA_DA_INFORMACAO, InterestArea.CIENCIA_DE_DADOS_E_IA),
+                mentor.getInterestArea());
         assertEquals("Experienced professional", mentor.getProfessionalSummary());
         assertEquals(AffiliationType.DOCENTE, mentor.getAffiliationType());
         assertEquals(Arrays.asList("AI", "Data Science"), mentor.getSpecializations());

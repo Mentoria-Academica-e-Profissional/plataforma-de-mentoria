@@ -11,6 +11,7 @@ import { SessionHistoryComponent } from './session-history/session-history.compo
 import { MentorRegisterComponent } from './auth/register/mentor-register/mentor-register/mentor-register.component';
 import { MentoredRegisterComponent } from './auth/register/mentored-register/mentored-register/mentored-register.component';
 import { SessionComponent } from './sessions/session.component';
+import { MaterialComponent } from './material/material.component';
 import { FeedbackComponent } from './profile/feedback/feedback.component';
 
 export const routes: Routes = [
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent, title: 'Plataforma de Mentoria', canActivate: [authGuard] },
   { path: 'sessions', component: SessionComponent , title: 'Sessões', canActivate: [authGuard]},
   { path: 'sessions/history', component: SessionHistoryComponent, title: 'Histórico de Sessões', canActivate: [authGuard] },
+  { path: 'materials', component: MaterialComponent, title: 'Materiais de Apoio', canActivate: [authGuard]},
   { path: 'materials', loadComponent: () => import('./material-library/material-library').then(m => m.MaterialLibraryComponent), title: 'Biblioteca de Materiais', canActivate: [authGuard] },
   { path: 'unauthorized', component: UnauthorizedComponent, title: 'Não autorizado' },
 

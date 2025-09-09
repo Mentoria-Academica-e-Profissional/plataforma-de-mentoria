@@ -14,12 +14,11 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/materiais")
+@RequestMapping("/api/materials")
 public class MaterialController {
 
     private final AuthService authService;
     private final MaterialService materialService;
-
 
     public MaterialController(MaterialService materialService, AuthService authService) {
         this.materialService = materialService;
@@ -29,11 +28,11 @@ public class MaterialController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MaterialDTO> createMaterial(
             @RequestPart("material") MaterialDTO materialDTO,
-            @RequestPart(name = "arquivo", required = false) MultipartFile arquivo
-            ) {
+            @RequestPart(name = "arquivo", required = false) MultipartFile arquivo) {
 
         try {
-            Long userId = authService.getCurrentUser().getId();
+            // Long userId = authService.getCurrentUser().getId();
+            Long userId = null; // Temporariamente desabilitado
 
             MaterialDTO savedMaterialDTO = materialService.createMaterial(materialDTO, arquivo, userId);
             return new ResponseEntity<>(savedMaterialDTO, HttpStatus.CREATED);
@@ -62,8 +61,7 @@ public class MaterialController {
     public ResponseEntity<MaterialDTO> updateMaterialById(
             @PathVariable Long id,
             @RequestPart("material") MaterialDTO materialDTO,
-            @RequestPart(name = "arquivo", required = false) MultipartFile arquivo
-    ) {
+            @RequestPart(name = "arquivo", required = false) MultipartFile arquivo) {
         try {
             MaterialDTO updatedMaterialDTO = materialService.updateById(id, materialDTO, arquivo);
             return ResponseEntity.ok(updatedMaterialDTO);
@@ -87,8 +85,9 @@ public class MaterialController {
     @GetMapping("/sugestoes")
     public ResponseEntity<List<MaterialDTO>> suggestMaterials() {
         try {
-            Long userId = authService.getCurrentUser().getId();
-            List<MaterialDTO> sugestoes = materialService.suggestMaterials(userId);
+            // Long userId = authService.getCurrentUser().getId();
+            // List<MaterialDTO> sugestoes = materialService.suggestMaterials(userId);
+            List<MaterialDTO> sugestoes = materialService.listAll(); // Temporariamente desabilitado
             return ResponseEntity.ok(sugestoes);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();

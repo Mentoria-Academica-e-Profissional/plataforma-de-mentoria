@@ -1,52 +1,59 @@
-<main class="main">
-  <header class="brand-name">
-    <button class="logout" (click)="logout()" *ngIf="isAuthenticated()">
-      Logout
-    </button>
-    <button class="history-button" (click)="navigateToHistory()" title="Ver Histórico">
-      <span>Histórico de Sessões</span>
-    </button>
-    <button class="logout" (click)="session()" *ngIf="isAuthenticated()">
-      Marcar Sessão
-    </button>
-    <button class="history-button" (click)="navigateToMaterials()" title="Biblioteca de Materiais">
-      <span>Biblioteca de Materiais</span>
-    </button>
-  </header>
-  <section class="content">
-    <p class="welcome-message">Bem vindo!</p>
-    <app-mentored-search *ngIf="hasMentoredRole(); else mentorSearch"></app-mentored-search>
-    <ng-template #mentorSearch>
-      <app-mentor-search *ngIf="hasMentorRole()"></app-mentor-search>
-    </ng-template>
-    <div class="search-section-mentor">
-      <div class="search-container">
-        <p class="description">
-          {{ hasMentorRole() ? '' : 'Preencha os campos para achar um mentor.' }}
+<div class="page-container">
+  <!-- Seção de Busca de Mentor/Mentorado -->
+  <section class="search-mentor-section">
+    <ng-container [ngSwitch]="userRole">
+      <!-- Exibe a busca de mentores se o usuário for um mentorado -->
+      <app-mentored-search *ngSwitchCase="'MENTORADO'"></app-mentored-search>
+      <!-- Exibe a busca de mentorados se o usuário for um mentor -->
+      <app-mentor-search *ngSwitchCase="'MENTOR'"></app-mentor-search>
+    </ng-container>
+  </section>
 
-        <div class="search-results">
-          <div *ngFor="let result of results" class="search-item">
-            <span class="search-item-name">{{ result.name }} </span><br />
-            <span class="search-item-course">{{ result.course }}</span
-            ><br />
-            <span class="search-item-interests">{{
-              result.interests.join(", ")
-            }}</span>
-          </div>
+  <!-- Seção do Feed de Materiais -->
+  <section class="feed-section">
+    <div class="feed-header">
+      <h2>Materiais em Destaque</h2>
+      <button class="filter-button" (click)="toggleFilter()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+        </svg>
+        Filtro
+      </button>
+    </div>
+
+    <!-- Área de Filtros para os Materiais -->
+    <div class="filter-area" *ngIf="showFilter">
+      <div class="filter-tags-container">
+        <button *ngFor="let area of interestAreas"
+                class="filter-tag"
+                [class.active]="isAreaSelected(area)"
+                (click)="toggleAreaSelection(area)">
+          {{ interestAreaLabels[area] }}
+        </button>
+        <button class="clear-filters-btn" *ngIf="selectedInterestAreas.length > 0" (click)="clearFilters()">
+          Limpar
+        </button>
+      </div>
+    </div>
+
+    <!-- Conteúdo do Feed -->
+    <div *ngIf="isLoading" class="loading-state">Carregando materiais...</div>
+    <div *ngIf="!isLoading && filteredMaterials.length > 0" class="feed-list">
+      <div *ngFor="let material of filteredMaterials" class="feed-item">
+        <div class="item-header">
+          <span class="item-type-tag">{{ getMaterialTypeLabel(material.materialType) }}</span>
+          <span class="item-date">{{ formatDate(material.createdAt) }}</span>
+        </div>
+        <h3 class="item-title">{{ material.title }}</h3>
+        <div class="item-tags">
+          <span *ngFor="let area of material.interestArea" class="tag">
+            {{ interestAreaLabels[area] }}
+          </span>
         </div>
       </div>
     </div>
+    <div *ngIf="!isLoading && filteredMaterials.length === 0" class="empty-state">
+      <p>Nenhum material encontrado.</p>
+    </div>
   </section>
-</main>
-<a routerLink="/profile" class="profile-link" title="Ver Perfil">
-  <svg
-    class="profile-icon"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-  >
-    <path
-      d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-    />
-  </svg>
-</a>
+</div>
