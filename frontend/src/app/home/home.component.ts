@@ -32,6 +32,10 @@ export class HomeComponent implements OnInit {
     this.userRole = this.authService.getRole();
     this.loadSuggestedMaterials();
   }
+  
+  navigateToMaterials(): void {
+    this.router.navigate(['/materials']);
+  }
 
   loadSuggestedMaterials(): void {
     this.isLoading = true;
