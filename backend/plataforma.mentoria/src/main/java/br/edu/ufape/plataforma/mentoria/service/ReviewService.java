@@ -59,6 +59,14 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+    // public List<ReviewResponseDTO> getCreatedReviewsByUser(Long userId, UserRole userRole) {
+    //     List<Review> reviews = reviewRepository.findReviewsCreatedByUserRole(userId, userRole);
+        
+    //     return reviews.stream()
+    //             .map(ReviewMapper::mapToResponseReviewDTO)
+    //             .collect(Collectors.toList());
+    // }
+
     public List<ReviewResponseDTO> getAllReviews() {
         return reviewRepository.findAll().stream()
             .map(ReviewMapper::mapToResponseReviewDTO)

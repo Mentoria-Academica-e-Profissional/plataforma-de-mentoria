@@ -66,15 +66,37 @@
     </span>
   </div>
 
+  <!-- Success and Error Messages -->
+  <div class="message-section" *ngIf="successMessage || errorMessage">
+    <div class="success-message" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+  </div>
+
   <!-- Session List -->
   <div class="session-list">
     <div class="session-card" *ngFor="let session of filteredSessions">
-      <div class="card-header">
+      <div class="card-header" 
+           [class.clickable]="canExpand(session)"
+           (click)="canExpand(session) ? toggleSessionExpansion(session.id) : null">
         <span class="session-topic">{{ session.meetingTopic }}</span>
-        <span class="status-tag" [ngClass]="getStatusClass(session.status)">{{
-          getStatusLabel(session.status)
-        }}</span>
+        <div class="header-right">
+          <span class="status-tag" [ngClass]="getStatusClass(session.status)">{{
+            getStatusLabel(session.status)
+          }}</span>
+          <span class="expand-icon" *ngIf="canExpand(session)">
+            <i class="fas" [class.fa-chevron-down]="!isSessionExpanded(session.id)" 
+               [class.fa-chevron-up]="isSessionExpanded(session.id)"></i>
+          </span>
+          <span class="review-hint" *ngIf="!canExpand(session)">
+            <small>{{ getSessionHint(session) }}</small>
+          </span>
+        </div>
       </div>
+      
       <div class="card-body">
         <div class="session-detail">
           <span class="detail-label">Data:</span>
@@ -90,6 +112,129 @@
           <span class="detail-label">Local:</span>
           <span class="detail-value">{{ session.location }}</span>
         </div>
+      </div>
+
+      <!-- Review Form (Expanded) -->
+      <div class="review-section" *ngIf="isSessionExpanded(session.id) && canReview(session)">
+        <h4>Avaliar esta sessão</h4>
+        
+        <!-- Error and Success Messages -->
+        <div class="message-container" *ngIf="errorMessage || successMessage">
+          <div class="error-message" *ngIf="errorMessage">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ errorMessage }}
+          </div>
+          <div class="success-message" *ngIf="successMessage">
+            <i class="fas fa-check-circle"></i>
+            {{ successMessage }}
+          </div>
+        </div>
+        
+        <form [formGroup]="reviewForm" (ngSubmit)="submitReview(session)">
+          
+          <!-- Star Rating -->
+          <div class="form-group">
+            <label>Nota (1-5 estrelas):</label>
+            <div class="star-rating">
+              <button
+                type="button"
+                *ngFor="let star of getStarArray()"
+                class="star-btn"
+                [class.active]="star <= reviewForm.value.score"
+                (click)="setRating(star)"
+                [title]="star + ' estrela' + (star > 1 ? 's' : '')"
+              >
+                ★
+              </button>
+            </div>
+            <p class="rating-display">Nota selecionada: {{ reviewForm.value.score }}/5</p>
+          </div>
+
+          <!-- Comment -->
+          <div class="form-group">
+            <label for="comment">Comentário (opcional):</label>
+            <textarea
+              id="comment"
+              formControlName="comment"
+              placeholder="Deixe seu comentário sobre a sessão..."
+              rows="4"
+              maxlength="600"
+            ></textarea>
+            <small class="char-count">
+              {{ reviewForm.value.comment?.length || 0 }}/600 caracteres
+            </small>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="submit-btn"
+              [disabled]="!reviewForm.valid || isSubmittingReview"
+            >
+              {{ isSubmittingReview ? 'Enviando...' : 'Enviar Avaliação' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Already Reviewed Message -->
+      <div class="already-reviewed-section" *ngIf="isSessionExpanded(session.id) && session.status === 'COMPLETED' && isSessionReviewed(session)">
+        <div class="already-reviewed-message">
+          <h4>✅ Sessão já avaliada</h4>
+          <p>Você já enviou uma avaliação para esta sessão. Cada sessão pode ser avaliada apenas uma vez.</p>
+        </div>
+      </div>
+
+      <!-- Status Update Form (Expanded) -->
+      <div class="status-update-section" *ngIf="isSessionExpanded(session.id) && canUpdateStatus(session)">
+        <h4>Atualizar Status da Sessão</h4>
+        
+        <!-- Error and Success Messages -->
+        <div class="message-container" *ngIf="errorMessage || successMessage">
+          <div class="error-message" *ngIf="errorMessage">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ errorMessage }}
+          </div>
+          <div class="success-message" *ngIf="successMessage">
+            <i class="fas fa-check-circle"></i>
+            {{ successMessage }}
+          </div>
+        </div>
+        
+        <form [formGroup]="statusUpdateForm" (ngSubmit)="updateSessionStatus(session)">
+          
+          <!-- Status Selection -->
+          <div class="form-group">
+            <label for="newStatus">Novo Status:</label>
+            <select id="newStatus" formControlName="newStatus" class="status-select">
+              <option value="">Selecione um status</option>
+              <option 
+                *ngFor="let option of getAvailableStatusOptions(session.status)" 
+                [value]="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+            <small class="status-help" *ngIf="session.status === 'PENDING'">
+              Sessões pendentes podem ser: Aceitas, Rejeitadas ou Canceladas
+            </small>
+            <small class="status-help" *ngIf="session.status === 'ACCEPTED'">
+              Sessões aceitas podem ser: Concluídas ou Canceladas
+            </small>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="submit-btn status-update-btn"
+              [disabled]="!statusUpdateForm.valid || isUpdatingStatus"
+            >
+              {{ isUpdatingStatus ? 'Atualizando...' : 'Atualizar Status' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
