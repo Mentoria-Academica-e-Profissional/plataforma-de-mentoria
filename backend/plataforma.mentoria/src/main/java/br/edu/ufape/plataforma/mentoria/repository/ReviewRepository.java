@@ -36,5 +36,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
         @Param("mentorRole") UserRole mentorRole,
         @Param("mentoredRole") UserRole mentoredRole
     );
+
+    /**
+     * Encontra todas as avaliações criadas por um determinado usuário com base no seu papel.
+     * @param userId O ID do usuário.
+     * @param reviewerRole O papel do usuário que criou as avaliações.
+     * @return Uma lista de avaliações criadas pelo usuário.
+     */
+    // @Query("SELECT r FROM Review r WHERE ((r.mentor.id = :userId AND r.reviewerRole = 'MENTOR') OR (r.mentored.id = :userId AND r.reviewerRole = 'MENTORADO')) AND r.reviewerRole = :reviewerRole")
+    // List<Review> findReviewsCreatedByUserRole(
+    //     @Param("userId") Long userId,
+    //     @Param("reviewerRole") UserRole reviewerRole
+    // );
     
 }

@@ -7,10 +7,10 @@ import { Mentor } from '../entity/mentor';
 import { Mentored } from '../entity/mentored';
 import { Session } from '../entity/session';
 import { SessionService } from './session.service';
-import { responseMentor } from '../entity/responses/response-mentor';
 import { responseMentored } from '../entity/responses/response-mentored';
 import { ProfileService } from '../profile/profile.service';
 import { User } from '../entity/user';
+import { MentorDTO } from '../entity/dto/mentor-dto';
 
 @Component({
   selector: 'app-session',
@@ -23,7 +23,7 @@ export class SessionComponent implements OnInit {
   title = 'Sessão';
 
   loading = false;
-  mentors: responseMentor[] | null = null;
+  mentors: MentorDTO[] | null = null;
   mentoreds: responseMentored[] | null = null;
   mentorId: number | null = null;
   mentoredId: number | null = null;

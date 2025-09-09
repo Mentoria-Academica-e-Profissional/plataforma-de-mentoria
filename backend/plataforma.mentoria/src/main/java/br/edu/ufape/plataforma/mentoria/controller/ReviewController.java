@@ -43,6 +43,13 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
+    // @GetMapping("/criadas")
+    // public ResponseEntity<List<ReviewResponseDTO>> getMyCreatedReviews() {
+    //     User user = authService.getCurrentUser();
+    //     List<ReviewResponseDTO> reviews = reviewService.getCreatedReviewsByUser(user.getId(), user.getRole());
+    //     return ResponseEntity.ok(reviews);
+    // }
+
     @GetMapping
     public ResponseEntity<List<ReviewResponseDTO>> getAllReviews() {
         List<ReviewResponseDTO> reviews = reviewService.getAllReviews();

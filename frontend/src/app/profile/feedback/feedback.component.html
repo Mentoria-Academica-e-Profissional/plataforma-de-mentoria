@@ -37,7 +37,7 @@
       <div *ngFor="let feedback of feedbacks" class="feedback-item">
         <div class="stars">
           <span 
-            *ngFor="let star of getStars(feedback.nota)"
+            *ngFor="let star of getStars(feedback.score)"
             class="star"
             [class.filled]="star === 'full'"
           >
@@ -45,13 +45,13 @@
           </span>
         </div>
         
-        <div *ngIf="feedback.comentario" class="comment">
+        <div *ngIf="feedback.comment" class="comment">
           <strong>Comentário:</strong>
-          <p>{{ feedback.comentario }}</p>
+          <p>{{ feedback.comment }}</p>
         </div>
         
         <div class="feedback-date">
-          {{ formatDate(feedback.data) }}
+          {{ formatDate(feedback.createdAt) }}
         </div>
       </div>
     </div>

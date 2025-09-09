@@ -317,3 +317,385 @@
     width: 100%;
   }
 }
+
+/* Review Section Styles */
+.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable:hover {
+  background-color: rgba(79, 70, 229, 0.05);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.expand-icon {
+  color: #6b7280;
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+}
+
+.review-hint {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+.review-hint small {
+  display: block;
+  margin: 0;
+}
+
+.review-section {
+  border-top: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0 0 12px 12px;
+}
+
+.review-section h4 {
+  margin: 0 0 1.5rem 0;
+  color: #374151;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+/* Message Styles */
+.message-container {
+  margin-bottom: 1.5rem;
+}
+
+.error-message,
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.error-message {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.error-message i {
+  color: #dc2626;
+}
+
+.success-message {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.success-message i {
+  color: #16a34a;
+}
+
+.star-rating {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0.25rem;
+  line-height: 1;
+  user-select: none;
+}
+
+.star-btn:hover,
+.star-btn.active {
+  color: #fbbf24;
+}
+
+.star-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.rating-display {
+  font-size: 0.875rem;
+  color: #374151;
+  margin: 0.5rem 0 0 0;
+  font-weight: 500;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.char-count {
+  display: block;
+  text-align: right;
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.submit-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.submit-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Mobile Responsive for Review Section */
+@media (max-width: 768px) {
+  .review-section {
+    padding: 1rem;
+  }
+
+  .star-rating {
+    justify-content: center;
+  }
+
+  .star-btn {
+    font-size: 1.25rem;
+  }
+
+  .form-actions {
+    justify-content: stretch;
+  }
+
+  .submit-btn {
+    width: 100%;
+  }
+}
+
+/* Status Update Section Styles */
+.status-update-section {
+  border-top: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  background-color: #fef3c7;
+  border-radius: 0 0 12px 12px;
+}
+
+.status-update-section h4 {
+  margin: 0 0 1.5rem 0;
+  color: #92400e;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.status-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  background-color: white;
+  transition: border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.status-update-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+}
+
+.status-update-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+}
+
+.status-update-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.status-update-btn:focus {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+/* Mobile Responsive for Status Update Section */
+@media (max-width: 768px) {
+  .status-update-section {
+    padding: 1rem;
+  }
+
+  .status-update-section .form-actions {
+    justify-content: stretch;
+  }
+
+  .status-update-btn {
+    width: 100%;
+  }
+}
+
+/* Status Help Text */
+.status-help {
+  display: block;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-style: italic;
+  margin-top: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #f9fafb;
+  border-radius: 4px;
+  border-left: 3px solid #f59e0b;
+}
+
+/* Already Reviewed Section */
+.already-reviewed-section {
+  border-top: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  background-color: #f0f9ff;
+  border-radius: 0 0 12px 12px;
+}
+
+.already-reviewed-message {
+  text-align: center;
+  color: #0369a1;
+}
+
+.already-reviewed-message h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #0369a1;
+}
+
+.already-reviewed-message p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #0284c7;
+  opacity: 0.8;
+}
+
+/* Message Section Styles */
+.message-section {
+  margin: 1rem 0;
+}
+
+.success-message {
+  background-color: #d1fae5;
+  border: 1px solid #10b981;
+  color: #047857;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.success-message::before {
+  content: "✅";
+  font-size: 1.1rem;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-message::before {
+  content: "⚠️";
+  font-size: 1.1rem;
+}
