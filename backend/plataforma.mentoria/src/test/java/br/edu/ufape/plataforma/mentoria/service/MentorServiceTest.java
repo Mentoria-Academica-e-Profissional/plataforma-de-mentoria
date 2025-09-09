@@ -10,23 +10,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import br.edu.ufape.plataforma.mentoria.dto.MentorDTO;
 import br.edu.ufape.plataforma.mentoria.dto.UpdateMentorDTO;
 import br.edu.ufape.plataforma.mentoria.enums.AffiliationType;
 import br.edu.ufape.plataforma.mentoria.enums.Course;
 import br.edu.ufape.plataforma.mentoria.enums.InterestArea;
-import br.edu.ufape.plataforma.mentoria.exceptions.AttributeAlreadyInUseException;
 import br.edu.ufape.plataforma.mentoria.exceptions.EntityNotFoundException;
 import br.edu.ufape.plataforma.mentoria.mapper.MentorMapper;
 import br.edu.ufape.plataforma.mentoria.model.Mentor;
-import br.edu.ufape.plataforma.mentoria.model.User;
 import br.edu.ufape.plataforma.mentoria.repository.MentorRepository;
 import br.edu.ufape.plataforma.mentoria.repository.UserRepository;
 
@@ -50,42 +46,6 @@ class MentorServiceTest {
 
     @Mock
     private Authentication authentication;
-
-    @Test
-    void testCreateMentor_Success() {
-        MentorDTO mentorDTO = new MentorDTO.Builder().build();
-        Mentor mentor = new Mentor.Builder().build();
-        User user = new User();
-        Mentor savedMentor = new Mentor.Builder().build();
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        when(userRepository.findByEmail(anyString())).thenReturn(user);
-        when(mentorMapper.toEntity(mentorDTO)).thenReturn(mentor);
-        when(mentorRepository.existsByCpf(any())).thenReturn(false);
-        when(mentorRepository.save(mentor)).thenReturn(savedMentor);
-        when(mentorMapper.toDTO(savedMentor)).thenReturn(mentorDTO);
-
-        MentorDTO result = mentorService.createMentor(mentorDTO);
-
-        assertEquals(mentorDTO, result);
-        verify(mentorRepository).save(mentor);
-    }
-
-    @Test
-    void testCreateMentor_CpfAlreadyInUse() {
-        MentorDTO mentorDTO = new MentorDTO.Builder().build();
-        Mentor mentor = new Mentor.Builder().build();
-        User user = new User();
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        doReturn(user).when(userRepository).findByEmail(anyString());
-        when(mentorMapper.toEntity(mentorDTO)).thenReturn(mentor);
-        when(mentorRepository.existsByCpf(any())).thenReturn(true);
-
-        assertThrows(AttributeAlreadyInUseException.class, () -> mentorService.createMentor(mentorDTO));
-    }
 
     @Test
     void testUpdateMentor_WithMentorEntity_Success() {

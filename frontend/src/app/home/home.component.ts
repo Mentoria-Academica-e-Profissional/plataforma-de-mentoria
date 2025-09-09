@@ -17,7 +17,8 @@ import { MaterialService } from '../material/material.service';
 export class HomeComponent implements OnInit {
   private authService = inject(AuthService);
   private materialService = inject(MaterialService);
-  
+  private router = inject(Router);
+
   userRole: string | null = null;
   suggestedMaterials: Material[] = [];
   filteredMaterials: Material[] = [];
