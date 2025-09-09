@@ -36,7 +36,7 @@
         id="mentorId" formControlName="mentorId" class="form-control">
         <option value="">Selecione um mentor</option>
         <option *ngFor="let mentor of mentors" [value]="mentor.id">
-            {{ mentor.fullName }} ({{ mentor.user.username }})
+            {{ mentor.fullName }}
         </option>
       </select>
     </div>

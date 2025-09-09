@@ -1,4 +1,5 @@
 package br.edu.ufape.plataforma.mentoria.security;
+
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -31,17 +36,17 @@ public class SecurityConfig {
         final String MENTORED_PATH = "/mentored/**";
 
         return httpSecurity.csrf(csrf -> csrf.disable())
-            .cors(cors -> {}) 
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .headers(headers -> headers.frameOptions(org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig::sameOrigin))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint()))
             .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers(new AntPathRequestMatcher("/api/materiais/**")).permitAll() // Permitir acesso público aos materiais de apoio
-            .requestMatchers(org.springframework.http.HttpMethod.POST, MENTOR_PATH, MENTORED_PATH).authenticated()
-            .requestMatchers(org.springframework.http.HttpMethod.PUT, MENTOR_PATH, MENTORED_PATH).authenticated()
-            .requestMatchers(org.springframework.http.HttpMethod.DELETE, MENTOR_PATH, MENTORED_PATH).authenticated()
-            .requestMatchers(org.springframework.http.HttpMethod.GET, "/avaliacoes").hasRole("ADMIN")
-            .anyRequest().permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/materiais/**")).permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, MENTOR_PATH, MENTORED_PATH).authenticated()
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, MENTOR_PATH, MENTORED_PATH).authenticated()
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, MENTOR_PATH, MENTORED_PATH).authenticated()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/avaliacoes").hasRole("ADMIN")
+                .anyRequest().permitAll()
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
@@ -60,5 +65,21 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:4200",
+            "https://plataforma-de-mentoria-frontend.onrender.com"
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

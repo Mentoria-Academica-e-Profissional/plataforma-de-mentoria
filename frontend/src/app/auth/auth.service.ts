@@ -5,6 +5,7 @@ import { Mentor } from '../entity/mentor';
 import { Mentored } from '../entity/mentored';
 import { responseMentored } from '../entity/responses/response-mentored';
 import { responseMentor } from '../entity/responses/response-mentor';
+import { MentorDTO } from '../entity/dto/mentor-dto';
 import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root',
@@ -115,7 +116,7 @@ export class AuthService {
     }
   }
 
-  async getAllMentor(): Promise<responseMentor[] | null> {
+  async getAllMentor(): Promise<MentorDTO[] | null> {
     try {
       const response = await fetch(this.apiUrlMentor, {
         method: 'GET',

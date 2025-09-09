@@ -10,6 +10,8 @@ import java.time.LocalTime;
 
 public class SessionDTO {
 
+    private Long id;
+
     @NotNull(message = "O ID do mentor é obrigatório")
     private Long mentorId;
 
@@ -99,5 +101,13 @@ public class SessionDTO {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

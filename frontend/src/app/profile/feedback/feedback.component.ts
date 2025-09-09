@@ -2,7 +2,18 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProfileService } from '../profile.service';
-import { Feedback } from '../../entity/Feedback';
+
+// Interface matching the actual API response
+interface FeedbackResponse {
+  id: number;
+  score: number;
+  comment: string;
+  sessionId: number;
+  mentorId: number;
+  mentoredId: number;
+  reviewerRole: string;
+  createdAt: string;
+}
 
 @Component({
   selector: 'app-feedback',
@@ -12,7 +23,7 @@ import { Feedback } from '../../entity/Feedback';
   styleUrls: ['./feedback.component.css']
 })
 export class FeedbackComponent implements OnInit {
-  feedbacks: Feedback[] = [];
+  feedbacks: FeedbackResponse[] = [];
   loading = true;
   error: string | null = null;
 
@@ -29,7 +40,7 @@ export class FeedbackComponent implements OnInit {
 
     this.profileService.getFeedbacks().subscribe({
       next: (data) => {
-        this.feedbacks = data;
+        this.feedbacks = data as unknown as FeedbackResponse[];
         this.loading = false;
       },
       error: (err) => {
@@ -40,8 +51,8 @@ export class FeedbackComponent implements OnInit {
     });
   }
 
-  getStars(nota: number): string[] {
-    return Array(5).fill('').map((_, i) => i < nota ? 'full' : 'empty');
+  getStars(score: number): string[] {
+    return Array(5).fill('').map((_, i) => i < score ? 'full' : 'empty');
   }
 
   formatDate(dateStr: string): string {
