@@ -65,14 +65,14 @@ class MentoredControllerIntegrationTest {
         org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor userAuth =
                 org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(email).roles("MENTORED");
 
-        ResultActions createResult = mockMvc.perform(post("/api/mentored") // CORRIGIDO
+        ResultActions createResult = mockMvc.perform(post("/api/mentored") 
                 .with(userAuth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mentoredDTO)));
         createResult.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.fullName", is("Test Mentored")));
 
-        mockMvc.perform(get("/api/mentored").with(userAuth)) // CORRIGIDO
+        mockMvc.perform(get("/api/mentored").with(userAuth)) 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", not(empty())));
     }
@@ -82,7 +82,7 @@ class MentoredControllerIntegrationTest {
         String email = createUniqueUser();
         org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor userAuth =
                 org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(email).roles("MENTORED");
-        mockMvc.perform(get("/api/mentored/999999").with(userAuth)) // CORRIGIDO
+        mockMvc.perform(get("/api/mentored/999999").with(userAuth)) 
                 .andExpect(status().isNotFound());
     }
 
@@ -94,7 +94,7 @@ class MentoredControllerIntegrationTest {
         org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor userAuth =
                 org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(email).roles("MENTORED");
 
-        String response = mockMvc.perform(post("/api/mentored") // CORRIGIDO
+        String response = mockMvc.perform(post("/api/mentored") 
                 .with(userAuth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mentoredDTO)))
@@ -102,7 +102,7 @@ class MentoredControllerIntegrationTest {
         MentoredDTO created = objectMapper.readValue(response, MentoredDTO.class);
 
         created.setFullName("Mentored Updated");
-        mockMvc.perform(put("/api/mentored/" + created.getId()) // CORRIGIDO
+        mockMvc.perform(put("/api/mentored/" + created.getId()) 
                 .with(userAuth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(created)))
@@ -118,14 +118,14 @@ class MentoredControllerIntegrationTest {
         org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor userAuth =
                 org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(email).roles("MENTORED");
 
-        String response = mockMvc.perform(post("/api/mentored") // CORRIGIDO
+        String response = mockMvc.perform(post("/api/mentored") 
                 .with(userAuth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mentoredDTO)))
                 .andReturn().getResponse().getContentAsString();
         MentoredDTO created = objectMapper.readValue(response, MentoredDTO.class);
 
-        mockMvc.perform(delete("/api/mentored/" + created.getId()) // CORRIGIDO
+        mockMvc.perform(delete("/api/mentored/" + created.getId()) 
                 .with(userAuth))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("sucesso")));
@@ -138,14 +138,14 @@ class MentoredControllerIntegrationTest {
         MentoredDTO mentoredDTO = buildValidMentoredDTO(cpf);
         var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(email).roles("MENTORED");
 
-        String response = mockMvc.perform(post("/api/mentored") // CORRIGIDO
+        String response = mockMvc.perform(post("/api/mentored") 
                 .with(userAuth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mentoredDTO)))
                 .andReturn().getResponse().getContentAsString();
         MentoredDTO created = objectMapper.readValue(response, MentoredDTO.class);
 
-        mockMvc.perform(get("/api/mentored/" + created.getId()).with(userAuth)) // CORRIGIDO
+        mockMvc.perform(get("/api/mentored/" + created.getId()).with(userAuth)) 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fullName", is("Test Mentored")));
     }
@@ -156,7 +156,7 @@ class MentoredControllerIntegrationTest {
         var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(email).roles("MENTORED");
         MentoredDTO mentoredDTO = buildValidMentoredDTO("123"); // CPF inválido
 
-        mockMvc.perform(post("/api/mentored") // CORRIGIDO
+        mockMvc.perform(post("/api/mentored") 
                 .with(userAuth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mentoredDTO)))
@@ -170,13 +170,13 @@ class MentoredControllerIntegrationTest {
         MentoredDTO mentoredDTO = buildValidMentoredDTO(cpf);
         var userAuth = org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(email).roles("MENTORED");
 
-        mockMvc.perform(post("/api/mentored") // CORRIGIDO
+        mockMvc.perform(post("/api/mentored") 
                 .with(userAuth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mentoredDTO)))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(post("/api/mentored") // CORRIGIDO
+        mockMvc.perform(post("/api/mentored") 
                 .with(userAuth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mentoredDTO)))
@@ -187,7 +187,7 @@ class MentoredControllerIntegrationTest {
     void shouldReturnUnauthorizedWhenNotAuthenticated() throws Exception {
         String cpf = generateUniqueCpf("33333");
         MentoredDTO mentoredDTO = buildValidMentoredDTO(cpf);
-        mockMvc.perform(post("/api/mentored") // CORRIGIDO
+        mockMvc.perform(post("/api/mentored") 
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mentoredDTO)))
                 .andExpect(status().isUnauthorized());

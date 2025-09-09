@@ -95,7 +95,7 @@ class SessionControllerIntegrationTest {
     @WithMockUser
     void testCreateSession() throws Exception {
         SessionDTO sessionDTO = buildValidSessionDTO();
-        mockMvc.perform(post("/api/sessions") // CORRIGIDO
+        mockMvc.perform(post("/api/sessions") 
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sessionDTO)))
                 .andExpect(status().isCreated())
@@ -105,7 +105,7 @@ class SessionControllerIntegrationTest {
     @Test
     @WithMockUser
     void testGetAllSessions() throws Exception {
-        mockMvc.perform(get("/api/sessions")) // CORRIGIDO
+        mockMvc.perform(get("/api/sessions")) 
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -113,7 +113,7 @@ class SessionControllerIntegrationTest {
     @Test
     @WithMockUser
     void testGetSessionById_NotFound() throws Exception {
-        mockMvc.perform(get("/api/sessions/{id}", 99999L)) // CORRIGIDO
+        mockMvc.perform(get("/api/sessions/{id}", 99999L)) 
                 .andExpect(status().isNotFound()); // Espera 404 para sessão inexistente
     }
 
@@ -126,7 +126,7 @@ class SessionControllerIntegrationTest {
         updatedDTO.setStatus(Status.COMPLETED);
     
         updatedDTO.setMentoredId(newSession.getMentored().getId());
-        mockMvc.perform(put("/api/sessions/{id}", newSession.getId()) // CORRIGIDO
+        mockMvc.perform(put("/api/sessions/{id}", newSession.getId()) 
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedDTO)))
                 .andExpect(status().isOk())
@@ -138,7 +138,7 @@ class SessionControllerIntegrationTest {
     void testDeleteSession() throws Exception {
         SessionDTO sessionDTO = buildValidSessionDTO();
         Session newSession = sessionService.createSession(sessionDTO);
-        mockMvc.perform(delete("/api/sessions/{id}", newSession.getId())) // CORRIGIDO
+        mockMvc.perform(delete("/api/sessions/{id}", newSession.getId())) 
                 .andExpect(status().isNoContent());
     }
 
@@ -147,7 +147,7 @@ class SessionControllerIntegrationTest {
     void testUpdateSessionStatus() throws Exception {
         SessionDTO sessionDTO = buildValidSessionDTO();
         Session newSession = sessionService.createSession(sessionDTO);
-        mockMvc.perform(patch("/api/sessions/{id}/status", newSession.getId()) // CORRIGIDO
+        mockMvc.perform(patch("/api/sessions/{id}/status", newSession.getId()) 
                 .param("newStatus", Status.CANCELLED.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is(Status.CANCELLED.toString())));
