@@ -60,4 +60,4 @@ Você pode acessar a versão online do projeto diretamente pelos links abaixo:
 
 ## Status do Projeto
 
-Em desenvolvimento 🚧
+Concluído ✅
