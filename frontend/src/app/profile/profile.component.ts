@@ -244,6 +244,11 @@ private formatInterestAreaName(area: string): string {
     return this.affiliationTypeMap[affiliationType] || affiliationType || 'Não informado';
   }
 
+
+  goToFeedback(): void {
+    this.router.navigate(['/profile/feedback']);
+  }
+  
   getCourseName(course: string): string {
     return this.courseMap[course] || course || 'Não informado';
   }
