@@ -37,6 +37,7 @@ public class SecurityConfig {
             .requestMatchers(org.springframework.http.HttpMethod.POST, MENTOR_PATH, MENTORED_PATH).authenticated()
             .requestMatchers(org.springframework.http.HttpMethod.PUT, MENTOR_PATH, MENTORED_PATH).authenticated()
             .requestMatchers(org.springframework.http.HttpMethod.DELETE, MENTOR_PATH, MENTORED_PATH).authenticated()
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/avaliacoes").hasRole("ADMIN")
             .anyRequest().permitAll()
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
