@@ -3,14 +3,21 @@
     <h1 class="welcome-message">Biblioteca de Materiais</h1>
   </header>
 
-
   <section class="mentor-search-center">
     <h2>Materiais Sugeridos</h2>
     <div class="materials-list">
-      <div *ngIf="suggestedMaterials.length === 0" class="no-results">
-        <p>Nenhum material sugerido encontrado.</p>
+      <div *ngIf="isLoading" class="loading-spinner">
+        <p>Carregando sugestões...</p>
+        <div class="spinner"></div>
       </div>
-      <div *ngIf="suggestedMaterials.length > 0" class="results-list">
+      <div *ngIf="!isLoading && suggestedMaterials.length === 0" class="info-message">
+        <p>
+          Sugestões personalizadas não disponíveis no momento.
+          <br>
+          <small>Isso pode ocorrer se você não estiver autenticado ou não houver sugestões para seu perfil.</small>
+        </p>
+      </div>
+      <div *ngIf="!isLoading && suggestedMaterials.length > 0" class="results-list">
         <div *ngFor="let material of suggestedMaterials" class="mentored-card">
           <h4>{{ material.title }}</h4>
           <p><strong>Tipo:</strong> {{ getMaterialTypeName(material.materialType) }}</p>
@@ -23,7 +30,6 @@
     </div>
   </section>
 
-  
   <section class="mentor-search-center">
     <h2>Filtros da Biblioteca</h2>
     <form class="search-form">
@@ -56,32 +62,53 @@
 
       <div class="form-group">
         <label for="interestArea">Área de Interesse:</label>
+        <div *ngIf="loadingInterestAreas" class="loading-indicator-small">
+          <small>Carregando áreas...</small>
+        </div>
         <select 
           id="interestArea" 
           [(ngModel)]="selectedArea" 
           name="interestArea"
           (change)="applyFilters()"
           class="form-control"
+          [disabled]="loadingInterestAreas"
         >
           <option value="">Todas as áreas</option>
           <option *ngFor="let area of interestAreas" [value]="area.value">{{area.label}}</option>
         </select>
       </div>
 
-      <button type="button" class="search-btn" (click)="applyFilters()">
-        Aplicar Filtros
-      </button>
+      <div class="button-group">
+        <button type="button" class="search-btn" (click)="applyFilters()">
+          Aplicar Filtros
+        </button>
+        <button type="button" class="btn-secondary" (click)="clearFilters()">
+          Limpar Filtros
+        </button>
+      </div>
     </form>
   </section>
 
- 
   <section class="mentor-search-center">
     <h2>Lista de Materiais</h2>
+    <div class="section-actions">
+      <button class="btn-refresh" title="Atualizar lista" (click)="loadAllMaterials()">
+        <span class="refresh-icon">↻</span> Atualizar
+      </button>
+    </div>
     <div class="materials-list">
-      <div *ngIf="filteredMaterials.length === 0" class="no-results">
+      <div *ngIf="isLoading" class="loading-spinner">
+        <p>Carregando materiais...</p>
+        <div class="spinner"></div>
+      </div>
+      <div *ngIf="loadingError" class="error-message">
+        <p>{{ errorMessage }}</p>
+        <button class="btn-secondary" (click)="retryLoading()">Tentar Novamente</button>
+      </div>
+      <div *ngIf="!isLoading && !loadingError && filteredMaterials.length === 0" class="no-results">
         <p>Nenhum material encontrado com os filtros selecionados.</p>
       </div>
-      <div *ngIf="filteredMaterials.length > 0" class="results-list">
+      <div *ngIf="!isLoading && filteredMaterials.length > 0" class="results-list">
         <div *ngFor="let material of filteredMaterials" class="mentored-card">
           <h4>{{ material.title }}</h4>
           <p><strong>Tipo:</strong> {{ getMaterialTypeName(material.materialType) }}</p>

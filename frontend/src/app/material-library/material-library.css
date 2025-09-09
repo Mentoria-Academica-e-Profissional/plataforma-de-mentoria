@@ -1,4 +1,3 @@
-/* Utilizando o estilo padrão da aplicação */
 .main {
   background: #f6f8fc;
   padding: 1rem;
@@ -89,6 +88,32 @@
   box-shadow: 0 4px 16px rgba(59, 107, 232, 0.15);
 }
 
+.btn-secondary {
+  background: #ffffff;
+  color: #3b6be8;
+  border: 1.5px solid #3b6be8;
+  border-radius: 18px;
+  padding: 0.6rem 1.6rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(59, 107, 232, 0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+  margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+  background: #f0f5ff;
+  box-shadow: 0 4px 16px rgba(59, 107, 232, 0.15);
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  width: 100%;
+}
+
 .no-results {
   color: #b23b3b;
   font-size: 1.1rem;
@@ -122,4 +147,118 @@
 .mentored-card p {
   margin: 0.3rem 0;
   color: #2a3b6e;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.spinner {
+  border: 4px solid rgba(59, 107, 232, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid #3b6be8;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 1rem 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  background: #ffe6e6;
+  border-radius: 12px;
+  border-left: 4px solid #b23b3b;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.error-message p {
+  color: #b23b3b;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.error-message button {
+  margin: 0 auto;
+  display: block;
+}
+
+.info-message {
+  background: #e6f7ff;
+  border-radius: 12px;
+  border-left: 4px solid #3498db;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.info-message p {
+  color: #2980b9;
+  font-weight: 500;
+}
+
+.info-message small {
+  display: block;
+  margin-top: 0.5rem;
+  font-weight: normal;
+  color: #7f8c8d;
+}
+
+.section-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.btn-refresh {
+  background: #f8f9fc;
+  color: #3b6be8;
+  border: 1px solid #c4d1ef;
+  border-radius: 8px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s;
+}
+
+.btn-refresh:hover {
+  background: #e6ecf7;
+}
+
+.refresh-icon {
+  display: inline-block;
+  font-size: 1.1rem;
+}
+
+.loading-indicator-small {
+  font-size: 0.8rem;
+  color: #3b6be8;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loading-indicator-small::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(59, 107, 232, 0.3);
+  border-radius: 50%;
+  border-top: 2px solid #3b6be8;
+  animation: spin 1s linear infinite;
 }
