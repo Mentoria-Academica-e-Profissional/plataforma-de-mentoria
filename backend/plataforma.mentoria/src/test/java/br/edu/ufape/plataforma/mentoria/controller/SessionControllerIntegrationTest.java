@@ -49,9 +49,7 @@ class SessionControllerIntegrationTest {
         mentorUser.setRole(br.edu.ufape.plataforma.mentoria.enums.UserRole.MENTOR);
         String mentorCpf = java.util.UUID.randomUUID().toString().replaceAll("[^0-9]", "");
         if (mentorCpf.length() > 11) mentorCpf = mentorCpf.substring(0, 11);
-        StringBuilder sbMentorCpf = new StringBuilder(mentorCpf);
-        sbMentorCpf.append("0");
-        mentorCpf = sbMentorCpf.toString();
+        else while (mentorCpf.length() < 11) mentorCpf += "0";
         Mentor mentor = new Mentor.Builder()
                 .fullName("Mentor Teste")
                 .cpf(mentorCpf)
@@ -72,9 +70,7 @@ class SessionControllerIntegrationTest {
         mentoredUser.setRole(br.edu.ufape.plataforma.mentoria.enums.UserRole.MENTORADO);
         String mentoredCpf = java.util.UUID.randomUUID().toString().replaceAll("[^0-9]", "");
         if (mentoredCpf.length() > 11) mentoredCpf = mentoredCpf.substring(0, 11);
-        StringBuilder sb = new StringBuilder(mentoredCpf);
-        while (sb.length() < 11) sb.append("1");
-        mentoredCpf = sb.toString();
+        else while (mentoredCpf.length() < 11) mentoredCpf += "1";
         Mentored mentored = new Mentored();
         mentored.setFullName("Mentorado Teste");
         mentored.setCpf(mentoredCpf);
@@ -99,7 +95,7 @@ class SessionControllerIntegrationTest {
     @WithMockUser
     void testCreateSession() throws Exception {
         SessionDTO sessionDTO = buildValidSessionDTO();
-        mockMvc.perform(post("/sessions")
+        mockMvc.perform(post("/api/sessions") // CORRIGIDO
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sessionDTO)))
                 .andExpect(status().isCreated())
@@ -109,7 +105,7 @@ class SessionControllerIntegrationTest {
     @Test
     @WithMockUser
     void testGetAllSessions() throws Exception {
-        mockMvc.perform(get("/sessions"))
+        mockMvc.perform(get("/api/sessions")) // CORRIGIDO
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -117,7 +113,7 @@ class SessionControllerIntegrationTest {
     @Test
     @WithMockUser
     void testGetSessionById_NotFound() throws Exception {
-        mockMvc.perform(get("/sessions/{id}", 99999L))
+        mockMvc.perform(get("/api/sessions/{id}", 99999L)) // CORRIGIDO
                 .andExpect(status().isNotFound()); // Espera 404 para sessão inexistente
     }
 
@@ -130,7 +126,7 @@ class SessionControllerIntegrationTest {
         updatedDTO.setStatus(Status.COMPLETED);
     
         updatedDTO.setMentoredId(newSession.getMentored().getId());
-        mockMvc.perform(put("/sessions/{id}", newSession.getId())
+        mockMvc.perform(put("/api/sessions/{id}", newSession.getId()) // CORRIGIDO
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedDTO)))
                 .andExpect(status().isOk())
@@ -142,7 +138,7 @@ class SessionControllerIntegrationTest {
     void testDeleteSession() throws Exception {
         SessionDTO sessionDTO = buildValidSessionDTO();
         Session newSession = sessionService.createSession(sessionDTO);
-        mockMvc.perform(delete("/sessions/{id}", newSession.getId()))
+        mockMvc.perform(delete("/api/sessions/{id}", newSession.getId())) // CORRIGIDO
                 .andExpect(status().isNoContent());
     }
 
@@ -151,7 +147,7 @@ class SessionControllerIntegrationTest {
     void testUpdateSessionStatus() throws Exception {
         SessionDTO sessionDTO = buildValidSessionDTO();
         Session newSession = sessionService.createSession(sessionDTO);
-        mockMvc.perform(patch("/sessions/{id}/status", newSession.getId())
+        mockMvc.perform(patch("/api/sessions/{id}/status", newSession.getId()) // CORRIGIDO
                 .param("newStatus", Status.CANCELLED.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is(Status.CANCELLED.toString())));
