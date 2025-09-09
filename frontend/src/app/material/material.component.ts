@@ -64,6 +64,11 @@ export class MaterialComponent implements OnInit {
     this.initializeGroupedAreas();
   }
 
+    clearFilters(): void {
+    this.filterInterestArray.clear();
+    this.applyFilters();
+  }
+
   ngOnInit(): void {
     this.loadAllMaterials();
   }
@@ -165,14 +170,14 @@ export class MaterialComponent implements OnInit {
     const index = array.controls.findIndex(x => x.value === area);
     if (index === -1) array.push(this.fb.control(area));
     else array.removeAt(index);
-    this.filterMaterials();
+    this.applyFilters();
   }
 
   isAreaSelected(area: InterestArea): boolean {
     return this.filterInterestArray.value.includes(area);
   }
 
-  filterMaterials(): void {
+  applyFilters(): void {
     const selectedAreas = this.filterInterestArray.value;
     if (selectedAreas.length === 0) {
       this.filteredMaterials = this.materials;
@@ -181,11 +186,6 @@ export class MaterialComponent implements OnInit {
     this.filteredMaterials = this.materials.filter(m => 
       selectedAreas.some((area: InterestArea) => m.interestArea.includes(area))
     );
-  }
-
-  clearFilters(): void {
-    this.filterInterestArray.clear();
-    this.filteredMaterials = this.materials;
   }
 
   toggleFilterForm(): void {
