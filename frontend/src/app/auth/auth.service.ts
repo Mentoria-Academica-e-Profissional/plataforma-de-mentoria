@@ -292,6 +292,20 @@ export class AuthService {
     }
   }
 
+  getRole(): string | null {
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+    try {
+      const decodedToken: any = jwtDecode(token);
+      return decodedToken.role || null;
+    } catch (error) {
+      console.error('Erro ao decodificar o token:', error);
+      return null;
+    }
+  }
+
   getToken(): string | null {
     return localStorage.getItem('token');
   }
