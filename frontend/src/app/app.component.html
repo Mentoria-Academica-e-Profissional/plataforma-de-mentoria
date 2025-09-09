@@ -1,4 +1,48 @@
-<section class="content">
-  <router-outlet></router-outlet>
-</section>
+<div class="app-container">
+  <ng-container *ngIf="showLayout">
+    <aside class="sidebar" [class.open]="isMenuOpen">
+      <div class="sidebar-header">
+        <button class="profile-btn" (click)="navigateTo('/profile')" title="Ver Perfil">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>Meu Perfil</span>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <a (click)="navigateTo('/home')">Home</a>
+        <a (click)="navigateTo('/sessions/history')">Sessões</a>
+        <a (click)="navigateTo('/materials')">Biblioteca</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a (click)="logout()">Sair</a>
+      </div>
+    </aside>
+  </ng-container>
+
+  <div class="menu-overlay" *ngIf="isMenuOpen && showLayout" (click)="toggleMenu()"></div>
+
+  <div class="main-content" [class.full-width]="!showLayout">
+    <header class="main-header" *ngIf="showLayout">
+      <div class="header-left">
+        <button class="hamburger" (click)="toggleMenu()">
+          <svg *ngIf="isMenuOpen" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          <svg *ngIf="!isMenuOpen" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <span class="header-title">Plataforma de Mentoria</span>
+      </div>
+    </header>
+    <main class="content-area">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
 
